@@ -1,5 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+phpinfo();
 class Welcome extends CI_Controller {
 
 	/**
@@ -29,6 +30,7 @@ class Welcome extends CI_Controller {
 		$config['base_url'] = 'http://example.com/index.php/test/page/';
 		$config['total_rows'] = 200;
 		$config['per_page'] = 20;
+		
 				
 		$this->pagination->initialize($config);
 		
