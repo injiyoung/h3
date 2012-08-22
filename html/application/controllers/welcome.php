@@ -19,7 +19,37 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->load->library('pagination');
+		$this->load->library('parser');
+		$this->load->model('Welcomemodel','',true);
+
+					
+		$this->Welcomemodel->insert_e();
+		
+		$config['base_url'] = 'http://example.com/index.php/test/page/';
+		$config['total_rows'] = 200;
+		$config['per_page'] = 20;
+				
+		$this->pagination->initialize($config);
+		
+		//echo $this->pagination->create_links();
+		
+		$this->load->library('test');	
+
+		//$this->test->test2();
+		
+		$data= array(
+				'title'=>'메롱',
+				'ddd'=>array(
+						array('title2' => 'Title 1', 'body' => 'Body 1'),
+						array('title2' => 'Title 2', 'body' => 'Body 2'),
+						array('title2' => 'Title 3', 'body' => 'Body 3'),
+						array('title2' => 'Title 4', 'body' => 'Body 4'),
+						array('title2' => 'Title 5', 'body' => 'Body 5'))
+		);
+				
+		$this->parser->parse('welcome_message',$data);
+		$this->output->enable_profiler(TRUE);
 	}
 }
 
