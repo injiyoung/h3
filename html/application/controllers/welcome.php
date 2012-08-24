@@ -1,6 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-phpinfo();
 class Welcome extends CI_Controller {
 
 	/**
@@ -18,6 +17,7 @@ class Welcome extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
+		
 	public function index()
 	{
 		$this->load->library('pagination');
@@ -35,6 +35,8 @@ class Welcome extends CI_Controller {
 		$this->pagination->initialize($config);
 		
 		//echo $this->pagination->create_links();
+		
+		echo "a";
 		
 		$this->load->library('test');	
 
