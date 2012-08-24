@@ -37,6 +37,7 @@ class Welcome extends CI_Controller {
 		//echo $this->pagination->create_links();
 		
 		echo "a";
+		echo "b";
 		
 		$this->load->library('test');	
 
