@@ -7,7 +7,7 @@ class Test {
      	
      	$CI =& get_instance();
   	
-     	echo $CI->config->item('uri_protocol');
-     	echo "test";
+     	//echo $CI->config->item('uri_protocol');
+     	//echo "test";
      }
  }

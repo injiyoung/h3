@@ -9,7 +9,7 @@ class Welcomemodel extends CI_Model {
      
      function insert_e() 
      {
-      echo "a";
+      //echo "a";
        
        
      }
