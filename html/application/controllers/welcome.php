@@ -17,15 +17,26 @@ class Welcome extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
-		
+
+	public function search()
+	{
+		print_r($this->uri->uri_to_assoc(2));
+		echo $this->input->get('aa');
+	}	
 	public function index()
 	{
+		
+		
 		$this->load->library('pagination');
 		$this->load->library('parser');
 		$this->load->model('Welcomemodel','',true);
 
-					
+
+		
 		$this->Welcomemodel->insert_e();
+		
+		
+		
 		
 		$config['base_url'] = 'http://example.com/index.php/test/page/';
 		$config['total_rows'] = 200;
@@ -36,13 +47,27 @@ class Welcome extends CI_Controller {
 		
 		//echo $this->pagination->create_links();
 		
-		echo "a";
-		echo "b";
-		
-		$this->load->library('test');	
+		$this->load->helper('url');
 
+		
+		$this->load->library('unit_test');
+		
+		
+		$this->load->library('test');
+		
+		$test = 1 + 1;
+		
+		$expected_result = 2;
+		
+		$test_name = 'Adds one plus one';
+		
+		$this->unit->run($test, $expected_result, $test_name,'aa');
+		//echo $this->unit->report();
+		
 		//$this->test->test2();
 		
+		//$this->output->cache(1);
+	
 		$data= array(
 				'title'=>'메롱',
 				'ddd'=>array(
@@ -56,7 +81,7 @@ class Welcome extends CI_Controller {
 		$this->parser->parse('welcome_message',$data);
 		$this->output->enable_profiler(TRUE);
 		
-		
+		$this->output->set_output("Asdasd");
 		
 	}
 }
