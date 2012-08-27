@@ -67,6 +67,9 @@ class Welcome extends CI_Controller {
 		//$this->test->test2();
 		
 		//$this->output->cache(1);
+		$this->load->helper('directory');
+		
+		print_r(directory_map('./', 2));
 	
 		$data= array(
 				'title'=>'메롱',
