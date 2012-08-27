@@ -55,6 +55,9 @@ class Welcome extends CI_Controller {
 				
 		$this->parser->parse('welcome_message',$data);
 		$this->output->enable_profiler(TRUE);
+		
+		
+		
 	}
 }
 
