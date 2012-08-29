@@ -53,7 +53,8 @@ class Welcome extends CI_Controller {
 		$this->load->library('unit_test');
 		
 		
-		$this->load->library('test');
+		$ccc=array('aaaa'=>'aaa');
+		$this->load->library('test',$ccc);
 		
 		$test = 1 + 1;
 		
@@ -64,12 +65,12 @@ class Welcome extends CI_Controller {
 		$this->unit->run($test, $expected_result, $test_name,'aa');
 		//echo $this->unit->report();
 		
-		//$this->test->test2();
+		$this->test->test();
 		
 		//$this->output->cache(1);
 		$this->load->helper('directory');
 		
-		print_r(directory_map('./', 2));
+		//print_r(directory_map('./', 2));
 	
 		$data= array(
 				'title'=>'메롱',

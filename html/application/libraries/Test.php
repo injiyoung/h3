@@ -2,11 +2,20 @@
 
 class Test {
 
+	
+	public function __construct($ccc)
+	{
+	
+		// Do something with $params
+	}
+	
      public function Test()
      {
-     	
+     	    	
+     	 
      	$CI =& get_instance();
-  	
+     	
+     	  	
      	//echo $CI->config->item('uri_protocol');
      	//echo "test";
      }
