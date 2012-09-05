@@ -1,19 +1,27 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+// SQLite3 PDO driver v.0.02 by Xintrea
+// Tested on CodeIgniter 1.7.1
+// Based on CI_DB_pdo_driver class v.0.1
+// Warning! This PDO driver work with SQLite3 only!
+
 /**
- * CodeIgniter
+ * Code Igniter
  *
- * An open source application development framework for PHP 5.1.6 or newer
+ * An open source application development framework for PHP 4.3.2 or newer
  *
  * @package		CodeIgniter
- * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
- * @license		http://codeigniter.com/user_guide/license.html
- * @author		EllisLab Dev Team
- * @link		http://codeigniter.com
- * @since		Version 2.1.2
+ * @author		Rick Ellis
+ * @copyright	Copyright (c) 2006, pMachine, Inc.
+ * @license		http://www.codeignitor.com/user_guide/license.html
+ * @link		http://www.codeigniter.com
+ * @since		Version 1.0
  * @filesource
  */
 
 // ------------------------------------------------------------------------
+
+
 
 /**
  * PDO Database Adapter Class
@@ -25,65 +33,17 @@
  * @package		CodeIgniter
  * @subpackage	Drivers
  * @category	Database
- * @author		EllisLab Dev Team
- * @link		http://codeigniter.com/user_guide/database/
+ * @author		Dready
+ * @link		http://dready.jexiste.fr/dotclear/
  */
+
 class CI_DB_pdo_driver extends CI_DB {
 
-	var $dbdriver = 'pdo';
-
-	// the character used to excape - not necessary for PDO
-	var $_escape_char = '';
-	var $_like_escape_str;
-	var $_like_escape_chr;
-	
-
-	/**
-	 * The syntax to count rows is slightly different across different
-	 * database engines, so this string appears in each driver and is
-	 * used for the count_all() and count_all_results() functions.
-	 */
-	var $_count_string = "SELECT COUNT(*) AS ";
-	var $_random_keyword;
-	
-	var $options = array();
-
-	function __construct($params)
-	{
-		parent::__construct($params);
-
-		// clause and character used for LIKE escape sequences
-		if (strpos($this->hostname, 'mysql') !== FALSE)
-		{
-			$this->_like_escape_str = '';
-			$this->_like_escape_chr = '';
-
-			//Prior to this version, the charset can't be set in the dsn
-			if(is_php('5.3.6'))
-			{
-				$this->hostname .= ";charset={$this->char_set}";
-			}
-
-			//Set the charset with the connection options
-			$this->options['PDO::MYSQL_ATTR_INIT_COMMAND'] = "SET NAMES {$this->char_set}";
-		}
-		elseif (strpos($this->hostname, 'odbc') !== FALSE)
-		{
-			$this->_like_escape_str = " {escape '%s'} ";
-			$this->_like_escape_chr = '!';
-		}
-		else
-		{
-			$this->_like_escape_str = " ESCAPE '%s' ";
-			$this->_like_escape_chr = '!';
-		}
-
-		empty($this->database) OR $this->hostname .= ';dbname='.$this->database;
-
-		$this->trans_enabled = FALSE;
-
-		$this->_random_keyword = ' RND('.time().')'; // database specific random keyword
-	}
+// Added by Xi
+        var $dbdriver = 'pdo';
+        var $_escape_char = ''; // The character used to escape with - not needed for SQLite
+        var $conn_id;
+        var $_random_keyword = ' Random()'; // database specific random keyword
 
 	/**
 	 * Non-persistent database connection
@@ -93,9 +53,27 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function db_connect()
 	{
-		$this->options['PDO::ATTR_ERRMODE'] = PDO::ERRMODE_SILENT;
+		$conn_id = false;
+		try {
+			$conn_id = new PDO ($this->database, $this->username, $this->password);
+			log_message('debug', "PDO driver connecting ".$this->database);
+		} catch (PDOException $e) {
+			log_message('debug','merde');
+			log_message('error', $e->getMessage());
+			if ($this->db_debug)
+            		{
+				$this->display_error($e->getMessage(), '', TRUE);
+            		}
+		}
+		log_message('debug',print_r($conn_id,true));
+		if ( $conn_id ) {
+			log_message('debug','PDO driver connection ok');
+		}
 
-		return new PDO($this->hostname, $this->username, $this->password, $this->options);
+                // Added by Xi
+                $this->conn_id=$conn_id;
+
+		return $conn_id;
 	}
 
 	// --------------------------------------------------------------------
@@ -103,35 +81,31 @@ class CI_DB_pdo_driver extends CI_DB {
 	/**
 	 * Persistent database connection
 	 *
-	 * @access	private called by the base class
+	 * @access	private, called by the base class
 	 * @return	resource
 	 */
 	function db_pconnect()
 	{
-		$this->options['PDO::ATTR_ERRMODE'] = PDO::ERRMODE_SILENT;
-		$this->options['PDO::ATTR_PERSISTENT'] = TRUE;
+	 // For SQLite architecture can not enable persistent connection
+	 return $this->db_connect();
 	
-		return new PDO($this->hostname, $this->username, $this->password, $this->options);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Reconnect
-	 *
-	 * Keep / reestablish the db connection if no queries have been
-	 * sent for a length of time exceeding the server's idle timeout
-	 *
-	 * @access	public
-	 * @return	void
-	 */
-	function reconnect()
-	{
-		if ($this->db->db_debug)
-		{
-			return $this->db->display_error('db_unsuported_feature');
+	/*
+		$conn_id = false;
+		try {
+			$conn_id = new PDO ($this->database, $this->username, $this->password, array(PDO::ATTR_PERSISTENT => true) );
+		} catch (PDOException $e) {
+			log_message('error', $e->getMessage());
+			if ($this->db_debug)
+            		{
+				$this->display_error($e->getMessage(), '', TRUE);
+            		}
 		}
-		return FALSE;
+
+                // Added by Xi
+                $this->conn_id=$conn_id;
+
+		return $conn_id;
+	*/
 	}
 
 	// --------------------------------------------------------------------
@@ -144,37 +118,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function db_select()
 	{
-		// Not needed for PDO
 		return TRUE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set client character set
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	string
-	 * @return	resource
-	 */
-	function db_set_charset($charset, $collation)
-	{
-		// @todo - add support if needed
-		return TRUE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Version number query string
-	 *
-	 * @access	public
-	 * @return	string
-	 */
-	function _version()
-	{
-		return $this->conn_id->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
 	// --------------------------------------------------------------------
@@ -182,34 +126,15 @@ class CI_DB_pdo_driver extends CI_DB {
 	/**
 	 * Execute the query
 	 *
-	 * @access	private called by the base class
+	 * @access	private, called by the base class
 	 * @param	string	an SQL query
-	 * @return	object
+	 * @return	resource
 	 */
 	function _execute($sql)
 	{
 		$sql = $this->_prep_query($sql);
-		$result_id = $this->conn_id->prepare($sql);
-		$result_id->execute();
-		
-		if (is_object($result_id))
-		{
-			if (is_numeric(stripos($sql, 'SELECT')))
-			{
-				$this->affect_rows = count($result_id->fetchAll());
-				$result_id->execute();
-			}
-			else
-			{
-				$this->affect_rows = $result_id->rowCount();
-			}
-		}
-		else
-		{
-			$this->affect_rows = 0;
-		}
-		
-		return $result_id;
+		log_message('debug','SQL : '.$sql);
+		return @$this->conn_id->query($sql);
 	}
 
 	// --------------------------------------------------------------------
@@ -223,26 +148,127 @@ class CI_DB_pdo_driver extends CI_DB {
 	 * @param	string	an SQL query
 	 * @return	string
 	 */
-	function _prep_query($sql)
-	{
+    function &_prep_query($sql)
+    {
 		return $sql;
+    }
+
+
+// Modify by Xi
+	/**
+	 * "Smart" Escape String
+	 *
+	 * Escapes data based on type
+	 * Sets boolean and null types
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	integer
+	 */
+	function escape($str)
+	{
+		switch (gettype($str))
+		{
+			case 'string'	:	$str = "'".$this->escape_str($str)."'";
+				break;
+			case 'boolean'	:	$str = ($str === FALSE) ? 0 : 1;
+				break;
+			default			:	$str = ($str === NULL) ? 'NULL' : $str;
+				break;
+		}
+
+		return $str;
 	}
+
 
 	// --------------------------------------------------------------------
 
 	/**
+	 * Escape String
+	 *
+	 * @access	public
+	 * @param	string
+	 * @return	string
+	 */
+/*         
+	function escape_str($str)
+	{
+		if (get_magic_quotes_gpc())
+		{
+			$str = stripslashes($str);
+		}
+		return $this->conn_id->quote($str);
+	}
+*/
+	// --------------------------------------------------------------------
+
+
+// Added by Xi
+/**         
+* Escape String         
+*         
+* @access      public         
+* @param       string         
+* @return      string         
+*/        
+function escape_str($str)        
+{
+ return sqlite_escape_string($str);        
+}
+
+
+// Added by Xi
+/** * Escape the SQL Identifiers * 
+* This function escapes column and table names * 
+* @accessprivate 
+* @paramstring 
+* @returnstring */
+function _escape_identifiers($item)
+{
+ if ($this->_escape_char == '')
+  {
+   return $item;
+  }
+
+ foreach ($this->_reserved_identifiers as $id)
+  {
+   if (strpos($item, '.'.$id) !== FALSE)
+    {
+     $str = $this->_escape_char. str_replace('.', $this->_escape_char.'.', $item);  
+                                
+     // remove duplicates if the user already included the escape
+     return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
+    }               
+  }
+        
+ if (strpos($item, '.') !== FALSE)
+  {
+   $str = $this->_escape_char.str_replace('.', $this->_escape_char.'.'.$this->_escape_char, $item).$this->_escape_char;                    
+  }
+ else
+  {
+   $str = $this->_escape_char.$item.$this->_escape_char;
+  }
+                
+ // remove duplicates if the user already included the escape
+ return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
+}
+
+
+// Add by Xi
+	/**
 	 * Begin Transaction
 	 *
 	 * @access	public
-	 * @return	bool
-	 */
+	 * @return	bool		
+	 */	
 	function trans_begin($test_mode = FALSE)
 	{
 		if ( ! $this->trans_enabled)
 		{
 			return TRUE;
 		}
-
+		
 		// When transactions are nested we only begin/commit/rollback the outermost ones
 		if ($this->_trans_depth > 0)
 		{
@@ -252,19 +278,21 @@ class CI_DB_pdo_driver extends CI_DB {
 		// Reset the transaction failure flag.
 		// If the $test_mode flag is set to TRUE transactions will be rolled back
 		// even if the queries produce a successful result.
-		$this->_trans_failure = (bool) ($test_mode === TRUE);
+		$this->_trans_failure = ($test_mode === TRUE) ? TRUE : FALSE;
 
-		return $this->conn_id->beginTransaction();
+		$this->simple_query('BEGIN TRANSACTION');
+		return TRUE;
 	}
-
 	// --------------------------------------------------------------------
 
+
+// Add by Xi
 	/**
 	 * Commit Transaction
 	 *
 	 * @access	public
-	 * @return	bool
-	 */
+	 * @return	bool		
+	 */	
 	function trans_commit()
 	{
 		if ( ! $this->trans_enabled)
@@ -278,18 +306,19 @@ class CI_DB_pdo_driver extends CI_DB {
 			return TRUE;
 		}
 
-		$ret = $this->conn->commit();
-		return $ret;
+		$this->simple_query('COMMIT');
+		return TRUE;
 	}
-
 	// --------------------------------------------------------------------
 
+
+// Add by Xi
 	/**
 	 * Rollback Transaction
 	 *
 	 * @access	public
-	 * @return	bool
-	 */
+	 * @return	bool		
+	 */	
 	function trans_rollback()
 	{
 		if ( ! $this->trans_enabled)
@@ -303,94 +332,38 @@ class CI_DB_pdo_driver extends CI_DB {
 			return TRUE;
 		}
 
-		$ret = $this->conn_id->rollBack();
-		return $ret;
+		$this->simple_query('ROLLBACK');
+		return TRUE;
 	}
-
+	
 	// --------------------------------------------------------------------
 
-	/**
-	 * Escape String
-	 *
-	 * @access	public
-	 * @param	string
-	 * @param	bool	whether or not the string will be used in a LIKE condition
-	 * @return	string
-	 */
-	function escape_str($str, $like = FALSE)
-	{
-		if (is_array($str))
-		{
-			foreach ($str as $key => $val)
-			{
-				$str[$key] = $this->escape_str($val, $like);
-			}
-
-			return $str;
-		}
-		
-		//Escape the string
-		$str = $this->conn_id->quote($str);
-		
-		//If there are duplicated quotes, trim them away
-		if (strpos($str, "'") === 0)
-		{
-			$str = substr($str, 1, -1);
-		}
-		
-		// escape LIKE condition wildcards
-		if ($like === TRUE)
-		{
-			$str = str_replace(	array('%', '_', $this->_like_escape_chr),
-								array($this->_like_escape_chr.'%', $this->_like_escape_chr.'_', $this->_like_escape_chr.$this->_like_escape_chr),
-								$str);
-		}
-
-		return $str;
-	}
-
-	// --------------------------------------------------------------------
 
 	/**
-	 * Affected Rows
+	 * Close DB Connection
 	 *
 	 * @access	public
-	 * @return	integer
+	 * @param	resource
+	 * @return	void
 	 */
-	function affected_rows()
+	function destroy($conn_id)
 	{
-		return $this->affect_rows;
+		$conn_id = null;
 	}
+
+
 
 	// --------------------------------------------------------------------
 
 	/**
 	 * Insert ID
-	 * 
+	 *
 	 * @access	public
 	 * @return	integer
 	 */
-	function insert_id($name=NULL)
+	function insert_id()
 	{
-		//Convenience method for postgres insertid
-		if (strpos($this->hostname, 'pgsql') !== FALSE)
-		{
-			$v = $this->_version();
-
-			$table	= func_num_args() > 0 ? func_get_arg(0) : NULL;
-
-			if ($table == NULL && $v >= '8.1')
-			{
-				$sql='SELECT LASTVAL() as ins_id';
-			}
-			$query = $this->query($sql);
-			$row = $query->row();
-			return $row->ins_id;
-		}
-		else
-		{
-			return $this->conn_id->lastInsertId($name);
-		}
+		return @$this->conn_id->lastInsertId();
 	}
 
 	// --------------------------------------------------------------------
@@ -408,60 +381,78 @@ class CI_DB_pdo_driver extends CI_DB {
 	function count_all($table = '')
 	{
 		if ($table == '')
-		{
-			return 0;
-		}
+			return '0';
 
-		$query = $this->query($this->_count_string . $this->_protect_identifiers('numrows') . " FROM " . $this->_protect_identifiers($table, TRUE, NULL, FALSE));
+		$query = $this->query("SELECT COUNT(*) AS numrows FROM `".$table."`");
 
 		if ($query->num_rows() == 0)
-		{
-			return 0;
-		}
+			return '0';
 
 		$row = $query->row();
-		$this->_reset_select();
-		return (int) $row->numrows;
+		return $row->numrows;
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Show table query
-	 *
-	 * Generates a platform-specific query string so that the table names can be fetched
+	 * The error message string
 	 *
 	 * @access	private
-	 * @param	boolean
 	 * @return	string
 	 */
-	function _list_tables($prefix_limit = FALSE)
+	function _error_message()
 	{
-		$sql = "SHOW TABLES FROM `".$this->database."`";
-
-		if ($prefix_limit !== FALSE AND $this->dbprefix != '')
-		{
-			//$sql .= " LIKE '".$this->escape_like_str($this->dbprefix)."%' ".sprintf($this->_like_escape_str, $this->_like_escape_chr);
-			return FALSE; // not currently supported
-		}
-
-		return $sql;
+		$infos = $this->conn_id->errorInfo();
+		return $infos[2];
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Show column query
+	 * The error message number
 	 *
-	 * Generates a platform-specific query string so that the column names can be fetched
+	 * @access	private
+	 * @return	integer
+	 */
+	function _error_number()
+	{
+		$infos = $this->conn_id->errorInfo();
+		return $infos[1];
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Version number query string
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	function version()
+	{
+		return $this->conn_id->getAttribute(constant("PDO::ATTR_SERVER_VERSION"));
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Escape Table Name
+	 *
+	 * This function adds backticks if the table name has a period
+	 * in it. Some DBs will get cranky unless periods are escaped
 	 *
 	 * @access	public
 	 * @param	string	the table name
 	 * @return	string
 	 */
-	function _list_columns($table = '')
+	function escape_table($table)
 	{
-		return "SHOW COLUMNS FROM ".$table;
+		if (stristr($table, '.'))
+		{
+			$table = preg_replace("/\./", "`.`", $table);
+		}
+
+		return $table;
 	}
 
 	// --------------------------------------------------------------------
@@ -477,99 +468,9 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function _field_data($table)
 	{
-		return "SELECT TOP 1 FROM ".$table;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * The error message string
-	 *
-	 * @access	private
-	 * @return	string
-	 */
-	function _error_message()
-	{
-		$error_array = $this->conn_id->errorInfo();
-		return $error_array[2];
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * The error message number
-	 *
-	 * @access	private
-	 * @return	integer
-	 */
-	function _error_number()
-	{
-		return $this->conn_id->errorCode();
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Escape the SQL Identifiers
-	 *
-	 * This function escapes column and table names
-	 *
-	 * @access	private
-	 * @param	string
-	 * @return	string
-	 */
-	function _escape_identifiers($item)
-	{
-		if ($this->_escape_char == '')
-		{
-			return $item;
-		}
-
-		foreach ($this->_reserved_identifiers as $id)
-		{
-			if (strpos($item, '.'.$id) !== FALSE)
-			{
-				$str = $this->_escape_char. str_replace('.', $this->_escape_char.'.', $item);
-
-				// remove duplicates if the user already included the escape
-				return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
-			}
-		}
-
-		if (strpos($item, '.') !== FALSE)
-		{
-			$str = $this->_escape_char.str_replace('.', $this->_escape_char.'.'.$this->_escape_char, $item).$this->_escape_char;
-			
-		}
-		else
-		{
-			$str = $this->_escape_char.$item.$this->_escape_char;
-		}
-
-		// remove duplicates if the user already included the escape
-		return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * From Tables
-	 *
-	 * This function implicitly groups FROM tables so there is no confusion
-	 * about operator precedence in harmony with SQL standards
-	 *
-	 * @access	public
-	 * @param	type
-	 * @return	type
-	 */
-	function _from_tables($tables)
-	{
-		if ( ! is_array($tables))
-		{
-			$tables = array($tables);
-		}
-
-		return (count($tables) == 1) ? $tables[0] : '('.implode(', ', $tables).')';
+		$sql = "SELECT * FROM ".$this->escape_table($table)." LIMIT 1";
+		$query = $this->query($sql);
+		return $query->field_data();
 	}
 
 	// --------------------------------------------------------------------
@@ -587,25 +488,7 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function _insert($table, $keys, $values)
 	{
-		return "INSERT INTO ".$table." (".implode(', ', $keys).") VALUES (".implode(', ', $values).")";
-	}
-	
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert_batch statement
-	 *
-	 * Generates a platform-specific insert string from the supplied data
-	 *
-	 * @access  public
-	 * @param   string  the table name
-	 * @param   array   the insert keys
-	 * @param   array   the insert values
-	 * @return  string
-	 */
-	function _insert_batch($table, $keys, $values)
-	{
-		return "INSERT INTO ".$table." (".implode(', ', $keys).") VALUES ".implode(', ', $values);
+		return "INSERT INTO ".$this->escape_table($table)." (".implode(', ', $keys).") VALUES (".implode(', ', $values).")";
 	}
 
 	// --------------------------------------------------------------------
@@ -619,99 +502,16 @@ class CI_DB_pdo_driver extends CI_DB {
 	 * @param	string	the table name
 	 * @param	array	the update data
 	 * @param	array	the where clause
-	 * @param	array	the orderby clause
-	 * @param	array	the limit clause
 	 * @return	string
 	 */
-	function _update($table, $values, $where, $orderby = array(), $limit = FALSE)
+	function _update($table, $values, $where)
 	{
-		foreach ($values as $key => $val)
+		foreach($values as $key => $val)
 		{
 			$valstr[] = $key." = ".$val;
 		}
 
-		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
-
-		$orderby = (count($orderby) >= 1)?' ORDER BY '.implode(", ", $orderby):'';
-
-		$sql = "UPDATE ".$table." SET ".implode(', ', $valstr);
-
-		$sql .= ($where != '' AND count($where) >=1) ? " WHERE ".implode(" ", $where) : '';
-
-		$sql .= $orderby.$limit;
-
-		return $sql;
-	}
-	
-	// --------------------------------------------------------------------
-
-	/**
-	 * Update_Batch statement
-	 *
-	 * Generates a platform-specific batch update string from the supplied data
-	 *
-	 * @access	public
-	 * @param	string	the table name
-	 * @param	array	the update data
-	 * @param	array	the where clause
-	 * @return	string
-	 */
-	function _update_batch($table, $values, $index, $where = NULL)
-	{
-		$ids = array();
-		$where = ($where != '' AND count($where) >=1) ? implode(" ", $where).' AND ' : '';
-
-		foreach ($values as $key => $val)
-		{
-			$ids[] = $val[$index];
-
-			foreach (array_keys($val) as $field)
-			{
-				if ($field != $index)
-				{
-					$final[$field][] =  'WHEN '.$index.' = '.$val[$index].' THEN '.$val[$field];
-				}
-			}
-		}
-
-		$sql = "UPDATE ".$table." SET ";
-		$cases = '';
-
-		foreach ($final as $k => $v)
-		{
-			$cases .= $k.' = CASE '."\n";
-			foreach ($v as $row)
-			{
-				$cases .= $row."\n";
-			}
-
-			$cases .= 'ELSE '.$k.' END, ';
-		}
-
-		$sql .= substr($cases, 0, -2);
-
-		$sql .= ' WHERE '.$where.$index.' IN ('.implode(',', $ids).')';
-
-		return $sql;
-	}
-
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Truncate statement
-	 *
-	 * Generates a platform-specific truncate string from the supplied data
-	 * If the database does not support the truncate() command
-	 * This function maps to "DELETE FROM table"
-	 *
-	 * @access	public
-	 * @param	string	the table name
-	 * @return	string
-	 */
-	function _truncate($table)
-	{
-		return $this->_delete($table);
+		return "UPDATE ".$this->escape_table($table)." SET ".implode(', ', $valstr)." WHERE ".implode(" ", $where);
 	}
 
 	// --------------------------------------------------------------------
@@ -724,28 +524,43 @@ class CI_DB_pdo_driver extends CI_DB {
 	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the where clause
-	 * @param	string	the limit clause
 	 * @return	string
 	 */
-	function _delete($table, $where = array(), $like = array(), $limit = FALSE)
+	function _delete($table, $where)
 	{
-		$conditions = '';
+		return "DELETE FROM ".$this->escape_table($table)." WHERE ".implode(" ", $where);
+	}
 
-		if (count($where) > 0 OR count($like) > 0)
-		{
-			$conditions = "\nWHERE ";
-			$conditions .= implode("\n", $this->ar_where);
+	// --------------------------------------------------------------------
 
-			if (count($where) > 0 && count($like) > 0)
-			{
-				$conditions .= " AND ";
-			}
-			$conditions .= implode("\n", $like);
-		}
+	/**
+	 * Show table query
+	 *
+	 * Generates a platform-specific query string so that the table names can be fetched
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	function _show_tables()
+	{
+		return "SELECT name from sqlite_master WHERE type='table'";
+	}
 
-		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
+	// --------------------------------------------------------------------
 
-		return "DELETE FROM ".$table.$conditions.$limit;
+	/**
+	 * Show columnn query
+	 *
+	 * Generates a platform-specific query string so that the column names can be fetched
+	 *
+	 * @access	public
+	 * @param	string	the table name
+	 * @return	string
+	 */
+	function _show_columns($table = '')
+	{
+		// Not supported
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
@@ -763,50 +578,154 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	function _limit($sql, $limit, $offset)
 	{
-		if (strpos($this->hostname, 'cubrid') !== FALSE || strpos($this->hostname, 'sqlite') !== FALSE)
+		if ($offset == 0)
 		{
-			if ($offset == 0)
-			{
-				$offset = '';
-			}
-			else
-			{
-				$offset .= ", ";
-			}
-
-			return $sql."LIMIT ".$offset.$limit;
+			$offset = '';
 		}
 		else
 		{
-			$sql .= "LIMIT ".$limit;
-
-			if ($offset > 0)
-			{
-				$sql .= " OFFSET ".$offset;
-			}
-			
-			return $sql;
+			$offset .= ", ";
 		}
+
+		return $sql."LIMIT ".$offset.$limit;
 	}
 
-	// --------------------------------------------------------------------
+// Commented by Xi
+/**
+     * COPY FROM sqlite_driver.php
+     * Protect Identifiers ... contributed/requested by CodeIgniter user: quindo
+     *
+     * This function adds backticks if appropriate based on db type
+     *
+     * @access  private
+     * @param   mixed   the item to escape
+     * @param   boolean only affect the first word
+     * @return  mixed   the item with backticks
+     */
+/*
+    function _protect_identifiers($item, $first_word_only = FALSE)
+    {
+        if (is_array($item))
+        {
+            $escaped_array = array();
 
-	/**
-	 * Close DB Connection
-	 *
-	 * @access	public
-	 * @param	resource
-	 * @return	void
-	 */
-	function _close($conn_id)
-	{
-		$this->conn_id = null;
-	}
+            foreach($item as $k=>$v)
+            {
+                $escaped_array[$this->_protect_identifiers($k)] = $this->_protect_identifiers($v, $first_word_only);
+            }
+
+            return $escaped_array;
+        }
+
+        // This function may get "item1 item2" as a string, and so
+        // we may need "item1 item2" and not "item1 item2"
+        if (ctype_alnum($item) === FALSE)
+        {
+            if (strpos($item, '.') !== FALSE)
+            {
+                $aliased_tables = implode(".",$this->ar_aliased_tables).'.';
+                $table_name =  substr($item, 0, strpos($item, '.')+1);
+                $item = (strpos($aliased_tables, $table_name) !== FALSE) ? $item = $item : $this->dbprefix.$item;
+            }
+
+            // This function may get "field >= 1", and need it to return "field >= 1"
+            $lbound = ($first_word_only === TRUE) ? '' : '|\s|\(';
+
+            $item = preg_replace('/(^'.$lbound.')([\w\d\-\_]+?)(\s|\)|$)/iS', '$1$2$3', $item);
+        }
+        else
+        {
+            return "{$item}";
+        }
+
+        $exceptions = array('AS', '/', '-', '%', '+', '*');
+
+        foreach ($exceptions as $exception)
+        {
+            if (stristr($item, " {$exception} ") !== FALSE)
+            {
+                $item = preg_replace('/ ('.preg_quote($exception).') /i', ' $1 ', $item);
+            }
+        }
+        return $item;
+    }
+*/
+
+
+/**
+     * From Tables ... contributed/requested by CodeIgniter user: quindo
+     *
+     * This function implicitly groups FROM tables so there is no confusion
+     * about operator precedence in harmony with SQL standards
+     *
+     * @access  public
+     * @param   type
+     * @return  type
+     */
+    function _from_tables($tables)
+    {
+        if (! is_array($tables))
+        {
+            $tables = array($tables);
+        }
+
+        return implode(', ', $tables);
+    }
+
+// --------------------------------------------------------------------
+
+    /**
+     * Set client character set
+     * contributed/requested by CodeIgniter user:  jtiai
+     *
+     * @access    public
+     * @param    string
+     * @param    string
+     * @return    resource
+     */
+    function db_set_charset($charset, $collation)
+    {
+        // TODO - add support if needed
+        return TRUE;
+    }
+
+    // --------------------------------------------------------------------
+
+    /**
+     * Close DB Connection
+     *
+     * @access    public
+     * @param    resource
+     * @return    void
+     */
+    function _close($conn_id)
+    {
+        // Do nothing since PDO don't have close
+    }
+
+
+/**
+* List table query    
+*    
+* Generates a platform-specific query string so that the table names can be fetched    
+*    
+* @access      private    
+* @param       boolean    
+* @return      string    
+*/   
+function _list_tables($prefix_limit = FALSE)   
+{
+ $sql = "SELECT name from sqlite_master WHERE type='table'";           
+
+ if ($prefix_limit !== FALSE AND $this->dbprefix != '')
+  {
+   $sql .= " AND 'name' LIKE '".$this->dbprefix."%'";
+  }
+ 
+ return $sql;
+}
 
 
 }
 
-
-
-/* End of file pdo_driver.php */
-/* Location: ./system/database/drivers/pdo/pdo_driver.php */
+?>

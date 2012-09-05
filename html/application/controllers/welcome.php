@@ -23,16 +23,76 @@ class Welcome extends CI_Controller {
 		print_r($this->uri->uri_to_assoc(2));
 		echo $this->input->get('aa');
 	}	
+	
+	
 	public function index()
 	{
+		try{
+			$db = new PDO ("sqlite:h3.sqlite");
+		} catch(PDOException $e){
+			$errorinfo=$db->errorInfo();
+			log_message('Error', 'DB연동 실패'.$e);
+			exit;
+		}
 		
+		$stmt = $db->prepare('SELECT * FROM reg_data');
+		if (!$stmt) {
+			$errorinfo=$db->errorInfo();
+			log_message('Error', 'table 실패 : '.$errorinfo[2]);
+			exit;
+		}		
 		
+		$result=$stmt->execute();
+		if ($result) {
+			$row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_LAST);
+			
+			$result = $db->exec("update reg_data set totalcount=totalcount+1");
+			if (!$result) {
+				$errorinfo=$db->errorInfo();
+				log_message('Error', 'insert 실패 : '.$errorinfo[2]);
+				exit;
+			} else {
+				echo $row[0];
+			}			
+		} else {
+			$errorinfo=$db->errorInfo();
+			log_message('Error', 'select 실패 : '.$errorinfo[2]);
+			exit;		
+		}
+		
+
+			exit;
+				
+/*		
+		
+$this->load->driver('cache');
+
+$foo=1;
+
+if ($this->cache->apc->get('foo')) {
+	$foo=$this->cache->apc->get('foo')+1;
+}
+
+$this->cache->apc->save('foo', $foo, 100000000);
+		
+
+echo $this->cache->apc->get('foo');
+*/
 		$this->load->library('pagination');
 		$this->load->library('parser');
 		$this->load->model('Welcomemodel','',true);
-
-
+/*		
+		$this->load->database();
 		
+		$query = $this->db->query('SELECT * FROM open_chat LIMIT 1');
+		
+foreach ($query->result_array() as $row)
+ {
+print_r($row);
+ }
+*/		
+
+	
 		$this->Welcomemodel->insert_e();
 		
 		
@@ -49,23 +109,8 @@ class Welcome extends CI_Controller {
 		
 		$this->load->helper('url');
 
-		
-		$this->load->library('unit_test');
-		
-		
-		$ccc=array('aaaa'=>'aaa');
-		$this->load->library('test',$ccc);
-		
-		$test = 1 + 1;
-		
-		$expected_result = 2;
-		
-		$test_name = 'Adds one plus one';
-		
-		$this->unit->run($test, $expected_result, $test_name,'aa');
-		//echo $this->unit->report();
-		
-		$this->test->test();
+	
+		//$this->test->test();
 		
 		//$this->output->cache(1);
 		$this->load->helper('directory');
