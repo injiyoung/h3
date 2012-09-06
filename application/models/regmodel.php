@@ -48,7 +48,7 @@ class Regmodel extends CI_Model {
     	
     	$data['url']="http://stageapi.baas.io/test-organization/h3site/test15";
     	$data['post']="true";
-    	$data['httpheader']=array("Authorization: Bearer YWMta0ZcPvbxEeGjKQIAU6kAEwAAATmY_6VzTvgE1xrmpXasN8qEurirL1mBWLg");
+    	$data['httpheader']=array("Authorization: Bearer YWMtEY0l1PfLEeGj_QIAU6kAEwAAATmekgi_F2Tw2X260g0DgRusiKQeuzNLje8");
     	$data['postfields']=json_encode(array("member_uuid"=>$this->input->post('uuid'),"name"=>$this->input->post('name'),"email"=>$this->input->post('email'),"company"=>$this->input->post('company') ));
     	
     	$result=$this->global_lib->baas_curl($data);
