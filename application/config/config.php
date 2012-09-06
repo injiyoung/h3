@@ -1,5 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+// Baas info
+$config['ext_bass_url'] = 'http://stageapi.baas.io/test-organization/h3site/';
+$config['ext_bass_client_id'] = 'YXA6mUV54Oz3EeGYCAIAU6kAEw';
+$config['ext_bass_client_secret'] = 'YXA6gHqXVHYFvAbIkVeOueFJ_RBxHdw';
+
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
