@@ -1,6 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
 class Global_lib {
+	var $app_token="";
+	
 	public function __construct()
 	{
 		try{
@@ -8,7 +10,7 @@ class Global_lib {
 		} catch(PDOException $e){
 			$errorinfo=$this->db->errorInfo();
 			log_message('Error', 'DB연동 실패'.$e);
-			exit;
+			$this->global_lib->json_result(array(code=>'-1'));
 		}		
 	}
 	
@@ -19,7 +21,7 @@ class Global_lib {
 	   	curl_setopt($ch, CURLOPT_URL, $CI->config->item('ext_bass_url').$data['url']);
     	curl_setopt($ch, CURLOPT_POST, $data['post']);
     	curl_setopt($ch, CURLOPT_HTTPHEADER, $data['httpheader']);
-	   	curl_setopt($ch, CURLOPT_POSTFIELDS, $data['postfields']);
+	   	if ($data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, $data['postfields']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
      	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
      	$result_data=curl_exec($ch);  
@@ -30,12 +32,12 @@ class Global_lib {
      		$info = curl_getinfo($ch);
      		$info['result_data']=$result_data;     		
      	}
-     	
+    	
      	return $info;
     }
     
     // 토큰 만료 확인및 재발급
-    public function bass_token() 
+    public function bass_token($data) 
     {
     	$CI =& get_instance();
     	$stmt = $this->db->prepare('SELECT * FROM token');
@@ -44,15 +46,13 @@ class Global_lib {
     	
     	$row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_LAST);
 	
-    	if ($row[0]<=strtotime('now') or !$row[1]) 
+    	if ($row[0]<=strtotime('now') or !$row[1] or $data['reload']=='Y') 
     	{
     		$data['url']="token?grant_type=client_credentials&client_id=".$CI->config->item('ext_bass_client_id')."&client_secret=".$CI->config->item('ext_bass_client_secret');
     		$data['post']="false";
-    		$data['httpheader']=array("Authorization: Bearer YWMtEY0l1PfLEeGj_QIAU6kAEwAAATmekgi_F2Tw2X260g0DgRusiKQeuzNLje8");
-    		$data['postfields']="";
+    		$data['httpheader']=array("Authorization: Bearer ".$this->apptoken);
     		$result=$this->baas_curl($data);
     		$result_json=json_decode($result['result_data'],true);
-    		
     		$token=$result_json['access_token'];
     		
     		$stmt = $this->db->prepare("update token set expire_time='".strtotime('now +'.$result_json['expires_in'].' sec ')."',token='".$result_json['access_token']."' ");
@@ -60,7 +60,28 @@ class Global_lib {
     	} else {
     		$token=$row[1];
     	}
-    	return $token;
+    	
+    	$this->apptoken=$token;
+    }
+
+    // BaaS 환경설정 가져오기
+    function getconfig()
+    {
+    	if (!$this->apptoken) $this->bass_token();
+    	$data['url']="h3info";
+    	$data['post']="false";
+    	$data['httpheader']=array("Authorization: Bearer ".$this->apptoken);
+    	$result=$this->baas_curl($data);
+    	$result_json=json_decode($result['result_data'],true);
+  	
+    	return $result_json['entities'][0];
+    }
+    
+	// 최종 json encode
+    public function json_result($data)
+    {
+    	echo json_encode($data);
+    	exit;
     }
     
     
