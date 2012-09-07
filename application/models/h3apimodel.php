@@ -16,13 +16,12 @@ class H3apimodel extends CI_Model {
         	$errorinfo=$this->db->errorInfo();
         	log_message('Error', 'DB연동 실패'.$e);
         	$this->global_lib->json_result(array(code=>'-1'));
-        }
-        
+        }        
         $this->global_lib->getconfig();
     }
     
     function getconfig()
-    {
+    {ssss
     	return $this->global_lib->getconfig();
     }
     
@@ -49,7 +48,7 @@ class H3apimodel extends CI_Model {
      	return $row[0];
     }
     
-    function insertreg()
+    function regpost()
     {
     	//if ($this->regtotal() > 30800) exit;
    	

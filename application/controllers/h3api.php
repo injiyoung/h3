@@ -15,7 +15,7 @@ class h3api extends CI_Controller {
 
 	public function regpost()
 	{
-		$this->H3apimodel->insertreg();
+		$this->H3apimodel->regpost();
 	}
 
 	// 토큰 강제 재발급
