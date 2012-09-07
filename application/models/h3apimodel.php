@@ -21,7 +21,7 @@ class H3apimodel extends CI_Model {
     }
     
     function getconfig()
-    {ssss
+    {
     	return $this->global_lib->getconfig();
     }
     
