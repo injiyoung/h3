@@ -92,7 +92,9 @@ class H3apimodel extends CI_Model {
    	
     	$result=$this->global_lib->baas_curl($data);
   	
+    	
     	if ($result['http_code']!=200) {
+    		$this->output->set_status_header('500');
     		log_message('Error', '[regpost] BaaS 조회 실패 : '.$result['http_code'].' - '.$result['error_text']);
     		$this->global_lib->json_result(array(code=>'-2'));
     	} else {
@@ -119,7 +121,6 @@ class H3apimodel extends CI_Model {
     	$result=$this->global_lib->baas_curl($data);
     	
     	if ($result['http_code']!=200) {
-    		$this->output->set_header("HTTP/1.0 500 Internal Server Error");
     		$this->output->set_status_header('500');
     		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
     		log_message('Error', '[regpost] BaaS 등록 실패 : '.$result['http_code'].' - '.$result['error_text']);    		
