@@ -84,6 +84,8 @@ class H3apimodel extends CI_Model {
     	$data['postfields']=json_encode(array("MEMBER_UUID"=>$this->input->post('uuid'),"NAME"=>$this->input->post('name'),"EMAIL"=>$this->input->post('email'),"COMPANY"=>$this->input->post('company') ));
     	
     	$result=$this->global_lib->baas_curl($data);
+    	
+    	print_r($result);
    	
     	if ($result['http_code']!=200) {
     		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
