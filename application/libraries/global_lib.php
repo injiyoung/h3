@@ -14,6 +14,30 @@ class Global_lib {
 		}		
 	}
 	
+	// 이메일 발송
+	public function send_mail($data)
+	{
+		//$data['subject']="메롱";
+		//$data['body']="바바";
+		//$data['email']="hdae124@paran.com";
+		//$this->global_lib->send_mail($data);
+		
+		$CI =& get_instance();
+				
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, "http://mail.als.kthcorp.com:8082/1/email/outbound/request");
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode("puddingto:".$CI->config->item('ext_email'))));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, array('from'=>'H3 <h3@kthcorp.com>','to'=>$data['email'],'Subject'=>$data['subject'],'Contents'=>$data['body']));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		$result_data=curl_exec ($ch);
+		curl_close($ch);
+		
+		return $result_data;
+	}
+		
+	// baas연결용 curl
     public function baas_curl($data)
     {
     	$CI =& get_instance();
@@ -32,6 +56,7 @@ class Global_lib {
      		$info = curl_getinfo($ch);
      		$info['result_data']=$result_data;     		
      	}
+     	curl_close($ch);
      	
      	return $info;
     }

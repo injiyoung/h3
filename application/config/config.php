@@ -5,6 +5,10 @@ $config['ext_bass_url'] = 'http://stageapi.baas.io/test-organization/testapp01/'
 $config['ext_bass_client_id'] = 'YXA6q0jbmN-XEeGUggIAU6kAEw';
 $config['ext_bass_client_secret'] = 'YXA6vhr0m1OhBZH95ZNtgVF7mubBi5k';
 
+// DevOPS 이메일
+$config['ext_email'] = 'd47197e4-673b-4a57-bdb2-7269255caabb';
+
+
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
