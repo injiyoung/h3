@@ -8,11 +8,13 @@ class h3api extends CI_Controller {
 		$this->load->model('H3apimodel');
 	}
 
+	// 전체사전등록수
 	public function regtotal()
 	{
 		echo $this->H3apimodel->regtotal();
 	}
 
+	// 사전등록
 	public function regpost()
 	{
 		$this->H3apimodel->regpost();
@@ -24,9 +26,10 @@ class h3api extends CI_Controller {
 		$this->H3apimodel->retoken();
 	}
 	
+	// 패스워드찾기
 	public function schpwd()
 	{
-		$this->H3apimodel->insertreg();
+		$this->H3apimodel->schpwd();
 	}
 	
 	// 환경설정 가져오기
@@ -37,7 +40,7 @@ class h3api extends CI_Controller {
 	
 	public function index()
 	{
-		
+		echo "메롱";
 	}
 }
 
