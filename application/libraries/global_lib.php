@@ -24,7 +24,9 @@ class Global_lib {
 	   	if ($data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, $data['postfields']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
      	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-     	$result_data=curl_exec($ch);  
+     	$result_data=curl_exec($ch);
+
+     	print_r($data);
      	
      	if (curl_error($ch)) {
      		$info['error_text']=curl_error($ch);
