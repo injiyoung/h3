@@ -47,7 +47,7 @@ class Global_lib {
     	curl_setopt($ch, CURLOPT_HTTPHEADER, $data['httpheader']);
 	   	if ($data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, $data['postfields']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-     	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+     	curl_setopt($ch, CURLOPT_TIMEOUT, 20);
      	$result_data=curl_exec($ch);
 
      	if (curl_error($ch)) {
