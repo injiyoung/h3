@@ -39,6 +39,7 @@ class Global_lib {
     // 토큰 만료 확인및 재발급
     public function bass_token($data) 
     {
+    	print_r($data);
     	$CI =& get_instance();
     	$stmt = $this->db->prepare('SELECT * FROM token');
     	$result=$stmt->execute();
