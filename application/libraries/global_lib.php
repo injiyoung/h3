@@ -33,8 +33,6 @@ class Global_lib {
      		$info['result_data']=$result_data;     		
      	}
      	
-     	print_r($info);
-    	
      	return $info;
     }
     
