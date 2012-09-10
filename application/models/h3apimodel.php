@@ -17,7 +17,6 @@ class H3apimodel extends CI_Model {
         	log_message('Error', '[sqlite] DB연동 실패'.$e);
         	$this->global_lib->json_result(array(code=>'-1'));
         }        
-        $this->global_lib->getconfig();
     }
     
     function getconfig()

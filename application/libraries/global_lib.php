@@ -26,14 +26,14 @@ class Global_lib {
      	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
      	$result_data=curl_exec($ch);
 
-     	print_r($data);
-     	
      	if (curl_error($ch)) {
      		$info['error_text']=curl_error($ch);
      	} else {
      		$info = curl_getinfo($ch);
      		$info['result_data']=$result_data;     		
      	}
+     	
+     	print_r($info);
     	
      	return $info;
     }
