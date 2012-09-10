@@ -39,7 +39,6 @@ class Global_lib {
     // 토큰 만료 확인및 재발급
     public function bass_token($data="") 
     {
-    print_r($data);
     	$CI =& get_instance();
     	$stmt = $this->db->prepare('SELECT * FROM token');
     	$result=$stmt->execute();
@@ -58,6 +57,8 @@ class Global_lib {
     		
     		$stmt = $this->db->prepare("update token set expire_time='".strtotime('now +'.$result_json['expires_in'].' sec ')."',token='".$result_json['access_token']."' ");
     		$result=$stmt->execute();
+    		
+    		print_r($result);
     	} else {
     		$token=$row[1];
     	}
