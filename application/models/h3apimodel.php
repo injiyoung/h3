@@ -85,7 +85,7 @@ class H3apimodel extends CI_Model {
     	
     	$result=$this->global_lib->baas_curl($data);
     	
-    	print_r($result);
+    	print_r($data);
    	
     	if ($result['http_code']!=200) {
     		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
