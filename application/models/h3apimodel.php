@@ -54,7 +54,6 @@ class H3apimodel extends CI_Model {
     
     function regpost()
     {
-    	//if ($this->regtotal() > 30800) exit;
     	// 시작/마감 시간, 사전등록제한카운트 가져오기
     	$stmt = $this->db->prepare('SELECT * FROM reg_date');
     	if (!$stmt) {
@@ -120,6 +119,7 @@ class H3apimodel extends CI_Model {
     	$result=$this->global_lib->baas_curl($data);
     	
     	if ($result['http_code']!=200) {
+    		$this->output->set_status_header($result['http_code']);
     		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
     		log_message('Error', '[regpost] BaaS 등록 실패 : '.$result['http_code'].' - '.$result['error_text']);    		
     		$this->global_lib->json_result(array(code=>'-2'));
