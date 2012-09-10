@@ -58,7 +58,7 @@ class Global_lib {
     		$stmt = $this->db->prepare("update token set expire_time='".strtotime('now +'.$result_json['expires_in'].' sec ')."',token='".$result_json['access_token']."' ");
     		$result=$stmt->execute();
     		
-    		print_r($result);
+    		print_r("update token set expire_time='".strtotime('now +'.$result_json['expires_in'].' sec ')."',token='".$result_json['access_token']."' ");
     	} else {
     		$token=$row[1];
     	}
