@@ -1,5 +1,10 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
+/*
+ @author : hdae124@kthcorp.com
+ @date : 2012. 9. 11.
+*/
+
 class Global_lib {
 	var $app_token="";
 	
@@ -45,9 +50,9 @@ class Global_lib {
 	   	curl_setopt($ch, CURLOPT_URL, $CI->config->item('ext_bass_url').$data['url']);
     	curl_setopt($ch, CURLOPT_POST, $data['post']);
     	curl_setopt($ch, CURLOPT_HTTPHEADER, $data['httpheader']);
-	   	if ($data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, $data['postfields']);
+	   	if (@$data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, @$data['postfields']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-     	curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+     	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
      	$result_data=curl_exec($ch);
 
      	if (curl_error($ch)) {
@@ -71,7 +76,7 @@ class Global_lib {
     	
     	$row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_LAST);
 	
-    	if ($row[0]<=strtotime('now') or !$row[1] or $data['reload']=='Y') 
+    	if ($row[0]<=strtotime('now') or !$row[1] or @$data['reload']=='Y') 
     	{
     		$data['url']="token?grant_type=client_credentials&client_id=".$CI->config->item('ext_bass_client_id')."&client_secret=".$CI->config->item('ext_bass_client_secret');
     		$data['post']="false";
