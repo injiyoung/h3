@@ -18,6 +18,11 @@ class Welcome extends CI_Controller {
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
 
+	function __construct()
+	{
+		parent::__construct();
+		exit;
+	}	
 	public function search()
 	{
 		print_r($this->uri->uri_to_assoc(2));

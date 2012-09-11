@@ -1,9 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-/*
- @author : hdae124@kthcorp.com
- @date : 2012. 9. 11.
-*/
+/**
+ * @author : hdae124@kthcorp.com
+ * @date : 2012. 9. 10.
+ */
 
 class h3api extends CI_Controller {
 	
@@ -14,14 +14,20 @@ class h3api extends CI_Controller {
 		$this->load->model('H3apimodel');
 	}
 
-	// 전체사전등록수
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * 전체사전등록수
+	 */
 	public function regtotal()
 	{
 		$result=$this->H3apimodel->regtotal();
 		$this->global_lib->json_result($result);
 	}
 
-	// 사전등록
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * 사전등록
+	 */
 	public function regpost()
 	{
 		// 사전등록 기본정보 가져오기
@@ -46,7 +52,11 @@ class h3api extends CI_Controller {
 		}
 		
 		// 등록된 이메일인지 체크
-		$this->H3apimodel->regView($this->input->post('email'));
+		if ($this->H3apimodel->regView($this->input->post('email')))
+		{
+			// 이미 등록된 이메일
+			$this->global_lib->json_result(array('code'=>'-13'));
+		}
 		
 		// 전체 카운트 증가
 		$this->H3apimodel->regCountUpdate();
@@ -56,22 +66,43 @@ class h3api extends CI_Controller {
 		$data['email']=$this->input->post('email');
 		$data['company']=$this->input->post('company');
 		$result=$this->H3apimodel->regPost($data);
+		
 		$this->global_lib->json_result($result);
 	}
 
-	// 토큰 강제 재발급
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * 토큰 강제 재발급
+	 */
 	public function retoken()
 	{
 		$this->H3apimodel->retoken();
 	}
 	
-	// 패스워드찾기
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * 패스워드찾기
+	 */
 	public function schpwd()
 	{
-		$this->H3apimodel->schpwd();
+		if (!$this->input->get('email')) $this->global_lib->json_result(array('code'=>'-3'));
+			
+		if ($this->H3apimodel->regView($this->input->get('email')))
+		{
+   			// 메일 발송
+   			$data['subject']="메롱";
+   			$data['body']="바바";
+   			$data['email']=$this->input->get('email');
+   			$this->global_lib->send_mail($data);
+   			
+   			$this->global_lib->json_result(array('code'=>'0'));
+		}
 	}
 	
-	// 환경설정 가져오기
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * 환경설정 가져오기
+	 */
 	public function getconfig()
 	{
 		echo json_encode($this->H3apimodel->getconfig());
