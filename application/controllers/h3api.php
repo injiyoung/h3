@@ -89,7 +89,6 @@ class h3api extends CI_Controller {
 			
 		if ($this->H3apimodel->regView($this->input->get('email')))
 		{
-   			// 메일 발송
    			$data['subject']="메롱";
    			$data['body']="바바";
    			$data['email']=$this->input->get('email');
@@ -101,12 +100,24 @@ class h3api extends CI_Controller {
 	
 	/**
 	 * 2012. 9. 11. hdae124@kthcorp.com
-	 * 환경설정 가져오기
+	 * BaaS 환경설정 가져오기
 	 */
-	public function getconfig()
+	public function getConfig()
 	{
-		echo json_encode($this->H3apimodel->getconfig());
+		echo json_encode($this->global_lib->getConfig());
 	}	
+	
+	/**
+	 * 2012. 9. 11. hdae124@kthcorp.com
+	 * BaaS 환경설정 저장 
+	 */
+	public function setConfig()
+	{
+		if (!$this->input->get('starts') or !$this->input->get('ends')) $this->global_lib->json_result(array('code'=>'-3'));
+		$starts_at=date('c',strtotime($this->input->get('starts')));
+		$ends_at=date('c',strtotime($this->input->get('ends')));
+		echo json_encode($this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at)));
+	}
 	
 	public function index()
 	{
@@ -114,5 +125,5 @@ class h3api extends CI_Controller {
 	}
 }
 
-/* End of file regapi.php */
-/* Location: ./application/controllers/regapi.php */
+/* End of file h3api.php */
+/* Location: ./application/controllers/h3api.php */

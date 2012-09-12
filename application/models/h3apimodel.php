@@ -22,11 +22,25 @@ class H3apimodel extends CI_Model {
         }
     }
     
-    function getconfig()
+    function setConfig($data)
     {
-    	return $this->global_lib->getconfig();
+    	$cdata['url']="h3info/fabbe2d1-f33c-11e1-a329-020053a90013/";
+    	$cdata['post']="false";
+    	$cdata['customerquest']="PUT";
+    	$cdata['postfields']=json_encode(array("REG_STARTS_AT"=>$data['starts_at'],"REG_ENDS_AT"=>$data['ends_at']));
+    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
+    	$result=$this->global_lib->baas_curl($cdata);
+
+    	if ($result['http_code']!=200) {
+    		$this->output->set_status_header('500');
+    		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
+    		log_message('Error', '[regPost] BaaS 등록 실패 : '.$result['http_code'].' - '.$result['error_text']);
+    		$this->global_lib->json_result(array('code'=>'-2'));
+    	}
+    	
+    	return array('code'=>'0');
     }
-    
+        
     function retoken()
     {
     	$this->global_lib->bass_token(array('reload'=>'Y'));
@@ -85,11 +99,11 @@ class H3apimodel extends CI_Model {
      */
     function regView($email)
     {
-    	$data['url']="registration?filter=EMAIL='".$email."'";
-    	$data['post']="false";
-    	$data['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
+    	$cdata['url']="registration?filter=EMAIL='".$email."'";
+    	$cdata['post']="false";
+    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
     	
-    	$result=$this->global_lib->baas_curl($data);
+    	$result=$this->global_lib->baas_curl($cdata);
     	 
     	if (@$result['http_code']!=200) {
     		$this->output->set_status_header('500');
@@ -125,12 +139,12 @@ class H3apimodel extends CI_Model {
      */
     function regPost($data)
     {
-    	$data['url']="registration";
-    	$data['post']="true";
-    	$data['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
-    	$data['postfields']=json_encode(array("MEMBER_UUID"=>$data['uuid'],"NAME"=>$data['name'],"EMAIL"=>$data['email'],"COMPANY"=>$data['company'] ));
+    	$cdata['url']="registration";
+    	$cdata['post']="true";
+    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
+    	$cdata['postfields']=json_encode(array("MEMBER_UUID"=>$data['uuid'],"NAME"=>$data['name'],"EMAIL"=>$data['email'],"COMPANY"=>$data['company'] ));
     	
-    	$result=$this->global_lib->baas_curl($data);
+    	$result=$this->global_lib->baas_curl($cdata);
     	
     	if ($result['http_code']!=200) {
     		$this->output->set_status_header('500');

@@ -49,8 +49,9 @@ class Global_lib {
     	$ch = curl_init();
 	   	curl_setopt($ch, CURLOPT_URL, $CI->config->item('ext_bass_url').$data['url']);
     	curl_setopt($ch, CURLOPT_POST, $data['post']);
-    	curl_setopt($ch, CURLOPT_HTTPHEADER, $data['httpheader']);
+    	if (@$data['httpheader']) curl_setopt($ch, CURLOPT_HTTPHEADER, @$data['httpheader']);
 	   	if (@$data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, @$data['postfields']);
+	   	if (@$data['customerquest']) curl_setopt($ch, CURLOPT_CUSTOMREQUEST, @$data['customerquest']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
      	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
      	$result_data=curl_exec($ch);
@@ -80,7 +81,6 @@ class Global_lib {
     	{
     		$data['url']="token?grant_type=client_credentials&client_id=".$CI->config->item('ext_bass_client_id')."&client_secret=".$CI->config->item('ext_bass_client_secret');
     		$data['post']="false";
-    		$data['httpheader']=array("Authorization: Bearer ".$this->apptoken);
     		$result=$this->baas_curl($data);
     		$result_json=json_decode($result['result_data'],true);
     		$token=$result_json['access_token'];
@@ -95,7 +95,7 @@ class Global_lib {
     }
 
     // BaaS 환경설정 가져오기
-    function getconfig()
+    function getConfig()
     {
     	if (!$this->apptoken) $this->bass_token();
     	$data['url']="h3info";
