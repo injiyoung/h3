@@ -30,6 +30,8 @@ class h3api extends CI_Controller {
 	 */
 	public function regpost()
 	{
+		if (!$this->input->post('email') or !$this->input->post('name')) $this->global_lib->json_result(array('code'=>'-3'));
+		
 		// 사전등록 기본정보 가져오기
 		$regdate=$this->H3apimodel->regDate();
 		// 사전등록 전체 카운트 가져오기
@@ -85,6 +87,15 @@ class h3api extends CI_Controller {
 	{
 		$this->global_lib->bass_token(array('reload'=>'Y'));
 	}
+	
+	/**
+	 * 2012. 9. 12. hdae124@kthcorp.com
+	 * 사전등록 카운트 초기화
+	 */
+	public function resetcount()
+	{
+		$this->H3apimodel->resetCount();
+	}	
 	
 	/**
 	 * 2012. 9. 11. hdae124@kthcorp.com

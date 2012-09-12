@@ -42,6 +42,12 @@ class H3apimodel extends CI_Model {
     }
         
     
+	function resetCount() 
+	{
+		$stmt = $this->db->prepare('update reg_data set totalcount=0;');
+		$result=$stmt->execute();
+	}    
+    
    /**
     * 2012. 9. 11. hdae124@kthcorp.com
     * 전체 합계
