@@ -76,7 +76,7 @@ class h3api extends CI_Controller {
 	 */
 	public function retoken()
 	{
-		$this->H3apimodel->retoken();
+		$this->global_lib->bass_token(array('reload'=>'Y'));
 	}
 	
 	/**

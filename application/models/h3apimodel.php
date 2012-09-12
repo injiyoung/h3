@@ -41,11 +41,6 @@ class H3apimodel extends CI_Model {
     	return array('code'=>'0');
     }
         
-    function retoken()
-    {
-    	$this->global_lib->bass_token(array('reload'=>'Y'));
-    }
-    
     
    /**
     * 2012. 9. 11. hdae124@kthcorp.com
@@ -99,7 +94,7 @@ class H3apimodel extends CI_Model {
      */
     function regView($email)
     {
-    	$cdata['url']="registration?filter=EMAIL='".$email."'";
+    	$cdata['url']="user?filter=email='".$email."'";
     	$cdata['post']="false";
     	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
     	
