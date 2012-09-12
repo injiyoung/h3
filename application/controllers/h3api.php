@@ -83,10 +83,6 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * 패스워드찾기
 	 */
-	
-	public function member(){
-		print_r($this->H3apimodel->regView($this->input->get('email')));
-	}
 	public function schpwd()
 	{
 		if (!$this->input->get('email')) $this->global_lib->json_result(array('code'=>'-3'));
