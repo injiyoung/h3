@@ -1,8 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * @author : hdae124@kthcorp.com
- * @date : 2012. 9. 10.
+ * H3 API 모음
+ *
+ * Created on 2012. 9. 9.
+ * @author miyu <hdae124@kthcorp.com>
+ * @version 1.0
  */
 
 class h3api extends CI_Controller {
@@ -18,7 +21,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * 전체사전등록수
 	 */
-	public function regtotal()
+	function regtotal()
 	{
 		$result=$this->H3apimodel->regtotal();
 		$this->global_lib->json_result($result);
@@ -28,45 +31,55 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * 사전등록
 	 */
-	public function regpost()
+	function regpost()
 	{
 		if (!$this->input->post('email') or !$this->input->post('name')) $this->global_lib->json_result(array('code'=>'-3'));
 		
+		// --------------------------------------------------------------------------
 		// 사전등록 기본정보 가져오기
 		$regdate=$this->H3apimodel->regDate();
+		// --------------------------------------------------------------------------
 		// 사전등록 전체 카운트 가져오기
 		$regtotal=$this->H3apimodel->regTotal();
 
+		// --------------------------------------------------------------------------
 		// 사전등록 제한 카운트 체크
 		if ($regtotal['totalcount'] >= $regdate['max_count'])
 		{
 			$this->global_lib->json_result(array('code'=>'-12'));
 		}
+		// --------------------------------------------------------------------------
 		// 시작시간 체크
 		if ($regdate['start_date'] >= date( "Y-m-d H:i:s", strtotime('now')))
 		{
 			$this->global_lib->json_result(array('code'=>'-10'));
 		}
+		// --------------------------------------------------------------------------
 		// 마감시간 체크
 		if ($regdate['end_date'] <= date( "Y-m-d H:i:s", strtotime('now')))
 		{
 			$this->global_lib->json_result(array('code'=>'-11'));
 		}
 		
+		// --------------------------------------------------------------------------
 		// 회원 체크
 		if (!$this->H3apimodel->memberCheck($this->input->post('email')))
 		{
+			// --------------------------------------------------------------------------
 			// 회원이 아님
 			$this->global_lib->json_result(array('code'=>'-14'));
 		}
 
+		// --------------------------------------------------------------------------
 		// 등록된 이메일인지 체크
 		if ($this->H3apimodel->regView($this->input->post('email')))
 		{
+			// --------------------------------------------------------------------------
 			// 이미 등록된 이메일
 			$this->global_lib->json_result(array('code'=>'-13'));
 		}
 		
+		// --------------------------------------------------------------------------
 		// 전체 카운트 증가
 		$this->H3apimodel->regCountUpdate();
 		
@@ -83,7 +96,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * 토큰 강제 재발급
 	 */
-	public function retoken()
+	function retoken()
 	{
 		$this->global_lib->bass_token(array('reload'=>'Y'));
 	}
@@ -92,7 +105,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 12. hdae124@kthcorp.com
 	 * 사전등록 카운트 초기화
 	 */
-	public function resetcount()
+	function resetcount()
 	{
 		$this->H3apimodel->resetCount();
 	}	
@@ -101,7 +114,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * 패스워드찾기
 	 */
-	public function schpwd()
+	function schpwd()
 	{
 		if (!$this->input->get('email')) $this->global_lib->json_result(array('code'=>'-3'));
 			
@@ -122,7 +135,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * BaaS 환경설정 가져오기
 	 */
-	public function getConfig()
+	function getConfig()
 	{
 		echo json_encode($this->global_lib->getConfig());
 	}	
@@ -131,7 +144,7 @@ class h3api extends CI_Controller {
 	 * 2012. 9. 11. hdae124@kthcorp.com
 	 * BaaS 환경설정 저장 
 	 */
-	public function setConfig()
+	function setConfig()
 	{
 		if (!$this->input->get('starts') or !$this->input->get('ends')) $this->global_lib->json_result(array('code'=>'-3'));
 		$starts_at=date('c',strtotime($this->input->get('starts')));
@@ -139,11 +152,12 @@ class h3api extends CI_Controller {
 		echo json_encode($this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at)));
 	}
 	
-	public function index()
+	function index()
 	{
 		echo "메롱";
 	}
 }
 
+
 /* End of file h3api.php */
-/* Location: ./application/controllers/h3api.php */
+/* Location:  /application/controllers/h3api.php */

@@ -8,7 +8,7 @@
 class Global_lib {
 	var $app_token="";
 	
-	public function __construct()
+	function __construct()
 	{
 		try{
 			$this->db = new PDO ("sqlite:h3.sqlite");
@@ -19,8 +19,11 @@ class Global_lib {
 		}		
 	}
 	
-	// 이메일 발송
-	public function send_mail($data)
+ 	/**
+	 * 2012. 9. 12. hdae124@kthcorp.com
+	 * 이메일 발송
+	 */ 
+	function send_mail($data)
 	{
 		//$data['subject']="메롱";
 		//$data['body']="바바";
@@ -42,8 +45,11 @@ class Global_lib {
 		return $result_data;
 	}
 		
-	// baas연결용 curl
-    public function baas_curl($data)
+    /**
+     * 2012. 9. 12. hdae124@kthcorp.com
+     * baas연결용 curl
+     */ 
+    function baas_curl($data)
     {
     	$CI =& get_instance();
     	$ch = curl_init();
@@ -67,8 +73,11 @@ class Global_lib {
      	return $info;
     }
     
-    // 토큰 만료 확인및 재발급
-    public function bass_token($data="") 
+    /**
+     * 2012. 9. 12. hdae124@kthcorp.com
+     * 토큰 만료 확인및 재발급
+     */ 
+    function bass_token($data="") 
     {
     	$CI =& get_instance();
     	$stmt = $this->db->prepare('SELECT * FROM token');
@@ -94,7 +103,10 @@ class Global_lib {
     	$this->apptoken=$token;
     }
 
-    // BaaS 환경설정 가져오기
+    /**
+     * 2012. 9. 12. hdae124@kthcorp.com
+     * BaaS 환경설정 가져오기
+     */ 
     function getConfig()
     {
     	if (!$this->apptoken) $this->bass_token();
@@ -107,8 +119,11 @@ class Global_lib {
     	return $result_json['entities'][0];
     }
     
-	// 최종 json encode
-    public function json_result($data)
+    /**
+     * 2012. 9. 12. hdae124@kthcorp.com
+     * 최종 json encode
+     */ 
+    function json_result($data)
     {
     	echo json_encode($data);
     	exit;

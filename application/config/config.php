@@ -1,11 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-// Baas info
+// --------------------------------------------------------------------------
+// BaaS key
 $config['ext_bass_url'] = 'http://stageapi.baas.io/test-organization/h3app-java/';
 $config['ext_bass_client_id'] = 'YXA623ZGWfvWEeG-GQIAU6kAEw';
 $config['ext_bass_client_secret'] = 'YXA6p-TQIAbgCrYNoqUp9EaPsVkAjTA';
 
-// DevOPS 이메일
+// --------------------------------------------------------------------------
+// DevOPS 이메일API key
 $config['ext_email'] = 'd47197e4-673b-4a57-bdb2-7269255caabb';
 
 
