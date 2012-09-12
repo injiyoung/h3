@@ -99,6 +99,8 @@ class h3api extends CI_Controller {
    			$this->global_lib->send_mail($data);
    			
    			$this->global_lib->json_result(array('code'=>'0'));
+		} else {
+			$this->global_lib->json_result(array('code'=>'-11'));
 		}
 	}
 	
