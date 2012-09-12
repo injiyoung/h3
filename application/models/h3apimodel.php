@@ -11,34 +11,36 @@ class H3apimodel extends CI_Model {
     function __construct()
     {
     	parent::__construct();
-    	$this->global_lib->bass_token();
     	
         try{
         	$this->db = new PDO ("sqlite:h3.sqlite");
         } catch(PDOException $e){
         	$errorinfo=$this->db->errorInfo();
         	log_message('Error', '[sqlite] DB연동 실패'.$e);
-        	$this->global_lib->json_result(array('code'=>'-1'));
+        	$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
         }
     }
     
     function setConfig($data)
     {
-    	$cdata['url']="h3info/fabbe2d1-f33c-11e1-a329-020053a90013/";
+    	// --------------------------------------------------------------------------
+    	// 가장 최신에 수정된 h3info를 가지고 온다.
+		$result_json=$this->global_lib->getConfig();
+		
+    	$cdata['url']="h3info/".$result_json['uuid'];
     	$cdata['post']="false";
     	$cdata['customerquest']="PUT";
     	$cdata['postfields']=json_encode(array("REG_STARTS_AT"=>$data['starts_at'],"REG_ENDS_AT"=>$data['ends_at']));
-    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
     	$result=$this->global_lib->baas_curl($cdata);
-
-    	if ($result['http_code']!=200) {
-    		$this->output->set_status_header('500');
-    		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
-    		log_message('Error', '[regPost] BaaS 등록 실패 : '.$result['http_code'].' - '.$result['error_text']);
-    		$this->global_lib->json_result(array('code'=>'-2'));
-    	}
     	
-    	return array('code'=>'0');
+    	$stmt = $this->db->prepare("update reg_date set start_date='".$data['starts_at']."',end_date='".$data['ends_at']."' ");
+    	if (!$stmt) {
+    		$errorinfo=$this->db->errorInfo();
+    		log_message('Error', '[setConfig] table 실패 : '.$errorinfo[2]);
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
+    	} else {
+    		$result=$stmt->execute();    	
+    	}
     }
         
     
@@ -58,13 +60,13 @@ class H3apimodel extends CI_Model {
     	if (!$stmt) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[regTotal] table 실패 : '.$errorinfo[2]);
-    		$this->global_lib->json_result(array('code'=>'-1'));    		
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));    		
     	}
     	$result=$stmt->execute();
     	if (!$result) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[regTotal] select 실패 : '.$errorinfo[2]);
-    		$this->global_lib->json_result(array('code'=>'-1'));
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
     	}
     	$row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_LAST);
      	return array('code'=>'0','totalcount'=>$row[0]);
@@ -81,13 +83,13 @@ class H3apimodel extends CI_Model {
     	if (!$stmt) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[regDate] table 실패 : '.$errorinfo[2]);
-    		$this->global_lib->json_result(array('code'=>'-1'));
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
     	}
     	$result=$stmt->execute();
     	if (!$result) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[regDate] select 실패 : '.$errorinfo[2]);
-    		$this->global_lib->json_result(array('code'=>'-1'));
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
     	}
     	$row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_LAST);
     	return $row;
@@ -102,21 +104,14 @@ class H3apimodel extends CI_Model {
     {
     	$cdata['url']="registration?filter=EMAIL='".$email."'";
     	$cdata['post']="false";
-    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
-    	 
     	$result=$this->global_lib->baas_curl($cdata);
     
-    	if (@$result['http_code']!=200) {
-    		$this->output->set_status_header('500');
-    		log_message('Error', '[regView] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
-    		$this->global_lib->json_result(array('code'=>'-2'));
+    	$json_result=json_decode($result['result_data'],true);
+    	
+    	if ($json_result['entities']) {
+    		return $json_result['entities'];
     	} else {
-    		$json_result=json_decode($result['result_data'],true);
-    		if ($json_result['entities']) {
-    			return $json_result['entities'];
-    		} else {
-    			return "";;
-    		}
+    		return "";;
     	}
     }
         
@@ -128,22 +123,13 @@ class H3apimodel extends CI_Model {
     {
     	$cdata['url']="user?filter=email='".$email."'";
     	$cdata['post']="false";
-    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
-    	
     	$result=$this->global_lib->baas_curl($cdata);
     	 
-    	if (@$result['http_code']!=200) {
-    		$this->output->set_status_header('500');
-    		log_message('Error', '[memberCheck] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
-    		$this->global_lib->json_result(array('code'=>'-2'));
-    	} else {
-    		$json_result=json_decode($result['result_data'],true);
-    		if ($json_result['entities']) {
-    			return $json_result['entities'];
-    		} else {
-    			return "";; 
-    		}
-    	}    	
+   		$json_result=json_decode($result['result_data'],true);
+   		
+   		if ($json_result['entities']) {
+   			return $json_result['entities'];
+   		} 
     }
     
     /**
@@ -156,7 +142,7 @@ class H3apimodel extends CI_Model {
     	if (!$result) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[regCountUpdate] insert 실패 : '.$errorinfo[2]);
-    		$this->global_lib->json_result(array('code'=>'-1'));
+    		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
     	}    	
     }
     
@@ -168,19 +154,8 @@ class H3apimodel extends CI_Model {
     {
     	$cdata['url']="registration";
     	$cdata['post']="true";
-    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
     	$cdata['postfields']=json_encode(array("MEMBER_UUID"=>$data['uuid'],"NAME"=>$data['name'],"EMAIL"=>$data['email'],"COMPANY"=>$data['company'] ));
-    	
     	$result=$this->global_lib->baas_curl($cdata);
-    	
-    	if ($result['http_code']!=200) {
-    		$this->output->set_status_header('500');
-    		$result = $this->db->exec("update reg_data set totalcount=totalcount-1");
-    		log_message('Error', '[regPost] BaaS 등록 실패 : '.$result['http_code'].' - '.$result['error_text']);    		
-    		$this->global_lib->json_result(array('code'=>'-2'));
-    	} 
-   	
-    	return array('code'=>'0');
    }
    
    

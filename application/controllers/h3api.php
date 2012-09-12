@@ -33,7 +33,7 @@ class h3api extends CI_Controller {
 	 */
 	function regpost()
 	{
-		if (!$this->input->post('email') or !$this->input->post('name')) $this->global_lib->json_result(array('code'=>'-3'));
+		if (!$this->input->post('email') or !$this->input->post('name')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 		
 		// --------------------------------------------------------------------------
 		// 사전등록 기본정보 가져오기
@@ -46,28 +46,26 @@ class h3api extends CI_Controller {
 		// 사전등록 제한 카운트 체크
 		if ($regtotal['totalcount'] >= $regdate['max_count'])
 		{
-			$this->global_lib->json_result(array('code'=>'-12'));
+			$this->global_lib->error_result(array('code'=>'-12','code_text'=>'인원마감'));
 		}
 		// --------------------------------------------------------------------------
 		// 시작시간 체크
-		if ($regdate['start_date'] >= date( "Y-m-d H:i:s", strtotime('now')))
+		if ($regdate['start_date'] >= date( "c", strtotime('now')))
 		{
-			$this->global_lib->json_result(array('code'=>'-10'));
+			$this->global_lib->error_result(array('code'=>'-10','code_text'=>'사전등록 시작전'));
 		}
 		// --------------------------------------------------------------------------
 		// 마감시간 체크
-		if ($regdate['end_date'] <= date( "Y-m-d H:i:s", strtotime('now')))
+		if ($regdate['end_date'] <= date( "c", strtotime('now')))
 		{
-			$this->global_lib->json_result(array('code'=>'-11'));
+			$this->global_lib->error_result(array('code'=>'-11','code_text'=>'사전등록 마감'));
 		}
 		
 		// --------------------------------------------------------------------------
 		// 회원 체크
 		if (!$this->H3apimodel->memberCheck($this->input->post('email')))
 		{
-			// --------------------------------------------------------------------------
-			// 회원이 아님
-			$this->global_lib->json_result(array('code'=>'-14'));
+			$this->global_lib->error_result(array('code'=>'-4','code_text'=>'회원이 아님'));
 		}
 
 		// --------------------------------------------------------------------------
@@ -76,7 +74,7 @@ class h3api extends CI_Controller {
 		{
 			// --------------------------------------------------------------------------
 			// 이미 등록된 이메일
-			$this->global_lib->json_result(array('code'=>'-13'));
+			$this->global_lib->error_result(array('code'=>'-13','code_text'=>'이미 등록된 회원'));
 		}
 		
 		// --------------------------------------------------------------------------
@@ -89,7 +87,7 @@ class h3api extends CI_Controller {
 		$data['company']=$this->input->post('company');
 		$result=$this->H3apimodel->regPost($data);
 		
-		$this->global_lib->json_result($result);
+		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}
 
 	/**
@@ -116,7 +114,7 @@ class h3api extends CI_Controller {
 	 */
 	function schpwd()
 	{
-		if (!$this->input->get('email')) $this->global_lib->json_result(array('code'=>'-3'));
+		if (!$this->input->get('email')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 			
 		if ($this->H3apimodel->regView($this->input->get('email')))
 		{
@@ -125,9 +123,9 @@ class h3api extends CI_Controller {
    			$data['email']=$this->input->get('email');
    			$this->global_lib->send_mail($data);
    			
-   			$this->global_lib->json_result(array('code'=>'0'));
+   			$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 		} else {
-			$this->global_lib->json_result(array('code'=>'-11'));
+			$this->global_lib->error_result(array('code'=>'-4','code_text'=>'회원이 아님'));
 		}
 	}
 	
@@ -146,10 +144,15 @@ class h3api extends CI_Controller {
 	 */
 	function setConfig()
 	{
-		if (!$this->input->get('starts') or !$this->input->get('ends')) $this->global_lib->json_result(array('code'=>'-3'));
-		$starts_at=date('c',strtotime($this->input->get('starts')));
-		$ends_at=date('c',strtotime($this->input->get('ends')));
-		echo json_encode($this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at)));
+		if (!$this->input->get('starts') or !$this->input->get('ends')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
+		//$starts_at=date('c',strtotime($this->input->get('starts')));
+		//$ends_at=date('c',strtotime($this->input->get('ends')));
+		
+		$starts_at=$this->input->get('starts');
+		$ends_at=$this->input->get('ends');
+
+		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at));
+		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}
 	
 	function index()

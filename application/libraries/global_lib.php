@@ -6,7 +6,8 @@
 */
 
 class Global_lib {
-	var $app_token="";
+	var $apptoken="";
+	var $CI="";
 	
 	function __construct()
 	{
@@ -16,7 +17,8 @@ class Global_lib {
 			$errorinfo=$this->db->errorInfo();
 			log_message('Error', 'DB연동 실패'.$e);
 			$this->global_lib->json_result(array(code=>'-1'));
-		}		
+		}
+		$this->CI =& get_instance();
 	}
 	
  	/**
@@ -29,13 +31,11 @@ class Global_lib {
 		//$data['body']="바바";
 		//$data['email']="hdae124@paran.com";
 		//$this->global_lib->send_mail($data);
-		
-		$CI =& get_instance();
-				
+			
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, "http://mail.als.kthcorp.com:8082/1/email/outbound/request");
 		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode("puddingto:".$CI->config->item('ext_email'))));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode("puddingto:".$this->CI->config->item('ext_email'))));
 		curl_setopt($ch, CURLOPT_POSTFIELDS, array('from'=>'H3 <h3@kthcorp.com>','to'=>$data['email'],'Subject'=>$data['subject'],'Contents'=>$data['body']));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -51,22 +51,28 @@ class Global_lib {
      */ 
     function baas_curl($data)
     {
-    	$CI =& get_instance();
+    	if (!$this->apptoken and @$data['mode']!='token') $this->bass_token();
+    	
     	$ch = curl_init();
-	   	curl_setopt($ch, CURLOPT_URL, $CI->config->item('ext_bass_url').$data['url']);
+	   	curl_setopt($ch, CURLOPT_URL, $this->CI->config->item('ext_bass_url').$data['url']);
     	curl_setopt($ch, CURLOPT_POST, $data['post']);
-    	if (@$data['httpheader']) curl_setopt($ch, CURLOPT_HTTPHEADER, @$data['httpheader']);
+    	if ($this->apptoken) curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer ".$this->apptoken));
 	   	if (@$data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, @$data['postfields']);
 	   	if (@$data['customerquest']) curl_setopt($ch, CURLOPT_CUSTOMREQUEST, @$data['customerquest']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
      	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
      	$result_data=curl_exec($ch);
-
+     	
      	if (curl_error($ch)) {
      		$info['error_text']=curl_error($ch);
      	} else {
      		$info = curl_getinfo($ch);
-     		$info['result_data']=$result_data;     		
+     		$info['result_data']=$result_data;
+
+     		if ($info['http_code']!="200") {
+     			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
+     			$this->error_result(array('code'=>'-2','code_text'=>'BaaS오류'),$info['http_code']);
+     		}
      	}
      	curl_close($ch);
      	
@@ -79,7 +85,6 @@ class Global_lib {
      */ 
     function bass_token($data="") 
     {
-    	$CI =& get_instance();
     	$stmt = $this->db->prepare('SELECT * FROM token');
     	$result=$stmt->execute();
     	$errorinfo=$this->db->errorInfo();    	
@@ -88,9 +93,10 @@ class Global_lib {
 	
     	if ($row[0]<=strtotime('now') or !$row[1] or @$data['reload']=='Y') 
     	{
-    		$data['url']="token?grant_type=client_credentials&client_id=".$CI->config->item('ext_bass_client_id')."&client_secret=".$CI->config->item('ext_bass_client_secret');
-    		$data['post']="false";
-    		$result=$this->baas_curl($data);
+    		$cdata['url']="token?grant_type=client_credentials&client_id=".$this->CI->config->item('ext_bass_client_id')."&client_secret=".$this->CI->config->item('ext_bass_client_secret');
+    		$cdata['post']="false";
+    		$cdata['mode']="token";
+    		$result=$this->baas_curl($cdata);
     		$result_json=json_decode($result['result_data'],true);
     		$token=$result_json['access_token'];
     		
@@ -109,11 +115,11 @@ class Global_lib {
      */ 
     function getConfig()
     {
-    	if (!$this->apptoken) $this->bass_token();
-    	$data['url']="h3info";
-    	$data['post']="false";
-    	$data['httpheader']=array("Authorization: Bearer ".$this->apptoken);
-    	$result=$this->baas_curl($data);
+    	// --------------------------------------------------------------------------
+    	// 가장 최근에 수정된 h3info를 가지고 온다.
+    	$cdata['url']="h3info?ql=".urlencode('select * order by modified desc')."&limit=1";
+    	$cdata['post']="false";
+    	$result=$this->baas_curl($cdata);
     	$result_json=json_decode($result['result_data'],true);
   	
     	return $result_json['entities'][0];
@@ -129,6 +135,12 @@ class Global_lib {
     	exit;
     }
     
-    
+    function error_result($data,$errorcode='500') {
+    	$this->CI->output->set_status_header($errorcode);    	
+    	$this->json_result($data);
+    }
  }
+
  
+/* End of file global_lib.php */
+/* Location: /application/libraries/global_lib.php */
