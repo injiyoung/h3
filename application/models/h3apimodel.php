@@ -94,6 +94,32 @@ class H3apimodel extends CI_Model {
      */
     function regView($email)
     {
+    	$cdata['url']="registration?filter=EMAIL='".$email."'";
+    	$cdata['post']="false";
+    	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
+    	 
+    	$result=$this->global_lib->baas_curl($cdata);
+    
+    	if (@$result['http_code']!=200) {
+    		$this->output->set_status_header('500');
+    		log_message('Error', '[regView] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
+    		$this->global_lib->json_result(array('code'=>'-2'));
+    	} else {
+    		$json_result=json_decode($result['result_data'],true);
+    		if ($json_result['entities']) {
+    			return $json_result['entities'];
+    		} else {
+    			return "";;
+    		}
+    	}
+    }
+        
+    /**
+     * 2012. 9. 12. hdae124@kthcorp.com
+     * 회원 체크 
+     */
+    function memberCheck($email)
+    {
     	$cdata['url']="user?filter=email='".$email."'";
     	$cdata['post']="false";
     	$cdata['httpheader']=array("Authorization: Bearer ".$this->global_lib->apptoken);
@@ -102,7 +128,7 @@ class H3apimodel extends CI_Model {
     	 
     	if (@$result['http_code']!=200) {
     		$this->output->set_status_header('500');
-    		log_message('Error', '[regView] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
+    		log_message('Error', '[memberCheck] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
     		$this->global_lib->json_result(array('code'=>'-2'));
     	} else {
     		$json_result=json_decode($result['result_data'],true);

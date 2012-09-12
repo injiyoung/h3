@@ -51,6 +51,13 @@ class h3api extends CI_Controller {
 			$this->global_lib->json_result(array('code'=>'-11'));
 		}
 		
+		// 회원 체크
+		if (!$this->H3apimodel->memberCheck($this->input->post('email')))
+		{
+			// 회원이 아님
+			$this->global_lib->json_result(array('code'=>'-14'));
+		}
+
 		// 등록된 이메일인지 체크
 		if ($this->H3apimodel->regView($this->input->post('email')))
 		{
