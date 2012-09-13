@@ -7,7 +7,7 @@
 
 <style type="text/css">
 <!--
-body,td,th,pre,input,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체; font-size:9pt}
+body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체; font-size:9pt}
 -->
 </style>
 
@@ -16,24 +16,76 @@ body,td,th,pre,input,textarea,select {font-family: verdana, tahoma, 굴림, 굴�
 	<td style="font-size:24px;font-weight:bold;">H3 info</td>
 </tr>
 <tr>
+	<form  method="get" id="setConfigForm">
 	<td>
 		<table cellspacing="1" cellpadding="5" style="background-color:#000000; width:700px">
 		
-<?php foreach($h3info as $key=>$value):?>		
+<?php foreach($h3info as $key=>$value):?>
+	<?php if ($key != 'metadata'): ?>
 		<tr>
 			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;">
 				<?=$key?>
 			</td>
-			<td style="background-color:#E8E8E8;"><?=$value?></td>
+			<td style="background-color:#E8E8E8;">
+				<?php if ($key == 'REG_STARTS_AT' or $key == 'REG_ENDS_AT'): ?>
+					<input type="text" name="<?=$key?>" id="<?=$key?>" value="<?=$value?>">
+				<?php else: ?>
+  					<?=$value?>
+				<?php endif; ?>
+			</td>
 		</tr>
+	<?php endif; ?>		
 <?php endforeach;?>		
 
+		<tr>
+		<td align=center colspan=2 style="background-color:#E8E8E8; color:#FFFFFF;font-weight:bold;">
+		<input type=submit value=" 저 장 ">
+		</td>
 		</table>
 	</td>
+	</form>
 </tr>
 </table>
 
+<script type="text/javascript" src="http://developer.pudding.to/static/js/jquery-1.3.2.min.js"></script>
 
+<script>
+(function($){
+
+var $setConfigForm = $('#setConfigForm');
+
+if($setConfigForm.length > 0){
+	var $REG_STARTS_AT = $('#REG_STARTS_AT'),$REG_ENDS_AT = $('#REG_ENDS_AT')
+		
+	var setConfigData = function(REG_STARTS_AT,REG_ENDS_AT){
+		$.ajax({
+			url			: '/2012/h3api/setconfig/',
+			dataType   	: 'json',
+			type	   	: 'get',
+			contentType	: 'application/x-www-form-urlencoded; charset=UTF-8',
+			timeout		: 3000,
+			data		: {REG_STARTS_AT: REG_STARTS_AT,REG_ENDS_AT: REG_ENDS_AT},
+			success:function(r) {
+				if(r.code != 0){
+					alert('ErrorCode : '+r.code+', ErrorText : ' + r.code_text);
+				} else {
+					alert('수정 성공');
+				}
+			},
+			error: function(XMLHttpRequest,status){
+			   	alert('네트워크 오류');
+			}
+		});		
+	};
+	
+	$setConfigForm.submit(function(){
+		setConfigData($REG_STARTS_AT.val(),$REG_ENDS_AT.val());
+		return false;
+	});
+
+}
+})(jQuery);
+</script>
 	
 </body>
 </html>

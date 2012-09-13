@@ -70,7 +70,7 @@ class Global_lib {
      		$info['result_data']=$result_data;
 
      		if ($info['http_code']!="200") {
-     			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.@$result['http_code'].' - '.$result['error_text']);
+     			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.@$result['http_code'].' - '.@$result['error_text']);
      			$this->error_result(array('code'=>'-2','code_text'=>'BaaS오류'),$info['http_code']);
      		}
      	}

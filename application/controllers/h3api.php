@@ -144,12 +144,12 @@ class h3api extends CI_Controller {
 	 */
 	function setConfig()
 	{
-		if (!$this->input->get('starts') or !$this->input->get('ends')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
+		if (!$this->input->get('REG_STARTS_AT') or !$this->input->get('REG_ENDS_AT')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 		//$starts_at=date('c',strtotime($this->input->get('starts')));
 		//$ends_at=date('c',strtotime($this->input->get('ends')));
 		
-		$starts_at=$this->input->get('starts');
-		$ends_at=$this->input->get('ends');
+		$starts_at=$this->input->get('REG_STARTS_AT');
+		$ends_at=$this->input->get('REG_ENDS_AT');
 
 		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at));
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
