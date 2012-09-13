@@ -64,7 +64,7 @@ class h3api extends CI_Controller {
 		// 회원 체크
 		if (!$this->H3apimodel->memberCheck($this->input->post('email')))
 		{
-			//$this->global_lib->error_result(array('code'=>'-4','code_text'=>'회원이 아님'));
+			$this->global_lib->error_result(array('code'=>'-4','code_text'=>'회원이 아님'));
 		}
 
 		// --------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class h3api extends CI_Controller {
 		{
 			// --------------------------------------------------------------------------
 			// 이미 등록된 이메일
-			//$this->global_lib->error_result(array('code'=>'-13','code_text'=>'이미 등록된 회원'));
+			$this->global_lib->error_result(array('code'=>'-13','code_text'=>'이미 등록된 회원'));
 		}
 		
 		// --------------------------------------------------------------------------

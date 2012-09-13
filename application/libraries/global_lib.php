@@ -139,7 +139,7 @@ class Global_lib {
     
     function error_result($data,$errorcode='500') {
     	log_message('Error',@$data['code'].' : '.@$data['code_text']);
-    	$this->CI->output->set_status_header($errorcode);    	
+    	//$this->CI->output->set_status_header($errorcode);    	
     	$this->json_result($data);
     }
  }
