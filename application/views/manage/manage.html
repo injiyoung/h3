@@ -9,6 +9,41 @@
 body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체; font-size:9pt}
 </style>
 
+
+<table width="100%" cellspacing="0" cellpadding="5">
+<tr>
+	<td style="font-size:24px;font-weight:bold;">사전등록 정보</td>
+</tr>
+<tr>
+	<form  method="get" id="setConfigForm">
+	<td>
+		<table cellspacing="1" cellpadding="5" style="background-color:#000000; width:700px">
+		<tr>
+			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;width:160px">
+				전체 등록수
+			</td>
+			<td style="background-color:#E8E8E8;">
+				<?=$totalcount?>
+			</td>
+		</tr>
+		<tr>
+			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;width:160px">
+				등록 가능수
+			</td>
+			<td style="background-color:#E8E8E8;">
+				<input type="text" name="totalcount" id="totalcount" value="<?=$limitcount?>">
+			</td>
+		</tr>
+		<tr>
+		<td align=center colspan=2 style="background-color:#E8E8E8; color:#FFFFFF;font-weight:bold;">
+		<input type=submit value=" 저 장 "> 
+		</td>
+		</table>
+	</td>
+	</form>
+</tr>
+</table>
+
 <table width="100%" cellspacing="0" cellpadding="5">
 <tr>
 	<td style="font-size:24px;font-weight:bold;">H3 info</td>
@@ -21,7 +56,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 <?php foreach($h3info as $key=>$value):?>
 	<?php if ($key != 'metadata'): ?>
 		<tr>
-			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;">
+			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;width:160px">
 				<?=$key?>
 			</td>
 			<td style="background-color:#E8E8E8;">
@@ -37,7 +72,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 
 		<tr>
 		<td align=center colspan=2 style="background-color:#E8E8E8; color:#FFFFFF;font-weight:bold;">
-		<input type=submit value=" 저 장 ">
+		<input type=submit value=" 저 장 "> 
 		</td>
 		</table>
 	</td>
