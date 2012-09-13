@@ -32,7 +32,7 @@ class h3api extends CI_Controller {
 	 */
 	function regpost()
 	{
-		if (!$this->input->post('email') or !$this->input->post('name')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
+		if (!$this->input->post('uuid') or !$this->input->post('email') or !$this->input->post('name')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 		
 		// --------------------------------------------------------------------------
 		// 사전등록 기본정보 가져오기
