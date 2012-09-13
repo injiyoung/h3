@@ -1,0 +1,39 @@
+<html>
+<head>
+<title>관리자</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+
+<style type="text/css">
+<!--
+body,td,th,pre,input,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체; font-size:9pt}
+-->
+</style>
+
+<table width="100%" cellspacing="0" cellpadding="5">
+<tr>
+	<td style="font-size:24px;font-weight:bold;">H3 info</td>
+</tr>
+<tr>
+	<td>
+		<table cellspacing="1" cellpadding="5" style="background-color:#000000; width:700px">
+		
+<?php foreach($h3info as $key=>$value):?>		
+		<tr>
+			<td style="background-color:#808080; color:#FFFFFF;font-weight:bold;">
+				<?=$key?>
+			</td>
+			<td style="background-color:#E8E8E8;"><?=$value?></td>
+		</tr>
+<?php endforeach;?>		
+
+		</table>
+	</td>
+</tr>
+</table>
+
+
+	
+</body>
+</html>
