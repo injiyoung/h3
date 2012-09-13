@@ -146,4 +146,4 @@ class Global_lib {
 
  
 /* End of file global_lib.php */
-/* Location: /application/libraries/global_lib.php */
+/* Location: /2012/application/libraries/global_lib.php */

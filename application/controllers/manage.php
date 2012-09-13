@@ -17,11 +17,10 @@ class manage extends CI_Controller {
 	function panel() {
 		$data['h3info']=$this->global_lib->getConfig();
 		$data['base_url']=$this->config->item('base_url');
-		echo $data['base_url'];
 		$this->load->view('manage/manage.html',$data);
 	}
 }
 
 
 /* End of file manage.php */
-/* Location: /application/controllers/manage.php */
+/* Location: /2012/application/controllers/manage.php */
