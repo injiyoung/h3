@@ -69,7 +69,7 @@ class H3apimodel extends CI_Model {
     		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
     	}
     	$row = $stmt->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_LAST);
-     	return array('code'=>'0','totalcount'=>$row[0]);
+     	return $row[0];
     }
     
 

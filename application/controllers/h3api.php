@@ -23,7 +23,7 @@ class h3api extends CI_Controller {
 	function regtotal()
 	{
 		$result=$this->H3apimodel->regtotal();
-		$this->global_lib->json_result($result);
+		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공','totalcount'=>$result));
 	}
 
 	/**
@@ -43,7 +43,7 @@ class h3api extends CI_Controller {
 
 		// --------------------------------------------------------------------------
 		// 사전등록 제한 카운트 체크
-		if ($regtotal['totalcount'] >= $regdate['max_count'])
+		if ($regtotal >= $regdate['max_count'])
 		{
 			$this->global_lib->error_result(array('code'=>'-12','code_text'=>'인원마감'));
 		}
