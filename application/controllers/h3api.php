@@ -5,7 +5,6 @@
  *
  * Created on 2012. 9. 9.
  * @author miyu <hdae124@kthcorp.com>
- * @version 1.0
  */
 
 class h3api extends CI_Controller {

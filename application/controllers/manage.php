@@ -5,7 +5,6 @@
  *
  * Created on 2012. 9. 13.
  * @author miyu <hdae124@kthcorp.com>
- * @version 1.0
  */
 
 class manage extends CI_Controller {
@@ -13,11 +12,16 @@ class manage extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->library('global_lib');
-		//$this->load->model('H3apimodel');
 	}
 	
 	function panel() {
 		$data['h3info']=$this->global_lib->getConfig();
+		$data['base_url']=$this->config->item('base_url');
+		echo $data['base_url'];
 		$this->load->view('manage/manage.html',$data);
 	}
 }
+
+
+/* End of file manage.php */
+/* Location: /application/controllers/manage.php */

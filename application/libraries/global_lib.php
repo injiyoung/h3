@@ -1,9 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
-/*
- @author : hdae124@kthcorp.com
- @date : 2012. 9. 11.
-*/
+/**
+ * 공통 라이브러리
+ *
+ * Created on 2012. 9. 10.
+ * @author miyu <hdae124@kthcorp.com>
+ */
 
 class Global_lib {
 	var $apptoken="";
@@ -136,6 +138,7 @@ class Global_lib {
     }
     
     function error_result($data,$errorcode='500') {
+    	log_message('Error',@$data['code'].' : '.@$data['code_text']);
     	$this->CI->output->set_status_header($errorcode);    	
     	$this->json_result($data);
     }
