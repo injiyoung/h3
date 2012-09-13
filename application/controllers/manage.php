@@ -15,6 +15,7 @@ class manage extends CI_Controller {
 	}
 	
 	function panel() {
+		$data['today']=date('c');
 		$data['h3info']=$this->global_lib->getConfig();
 		$data['base_url']=$this->config->item('base_url');
 		$this->load->view('manage/manage.html',$data);

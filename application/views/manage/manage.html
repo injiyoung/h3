@@ -26,7 +26,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 			</td>
 			<td style="background-color:#E8E8E8;">
 				<?php if ($key == 'REG_STARTS_AT' or $key == 'REG_ENDS_AT'): ?>
-					<input type="text" name="<?=$key?>" id="<?=$key?>" value="<?=$value?>">
+					<input type="text" name="<?=$key?>" id="<?=$key?>" value="<?=$value?>"> <?=$today?>
 				<?php else: ?>
   					<?=$value?>
 				<?php endif; ?>
