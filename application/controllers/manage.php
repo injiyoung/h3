@@ -14,6 +14,10 @@ class manage extends CI_Controller {
 		$this->load->library('global_lib');
 	}
 	
+	/**
+	 * 2012. 9. 13. hdae124@kthcorp.com
+	 * h3info 수정 판넬
+	 */ 
 	function panel() {
 		$data['today']=date('c');
 		$data['h3info']=$this->global_lib->getConfig();
