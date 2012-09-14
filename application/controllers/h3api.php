@@ -102,6 +102,8 @@ class h3api extends CI_Controller {
 	function resetcount()
 	{
 		$this->H3apimodel->resetCount();
+		$this->output->set_content_type('application/json');		
+		$this->output->set_header("Content-Type: application/json");
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}	
 	

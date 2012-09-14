@@ -133,13 +133,17 @@ class Global_lib {
      */ 
     function json_result($data)
     {
+    	header('Content-Type: application/json');
     	echo json_encode($data);
     	exit;
     }
     
     function error_result($data,$errorcode='500') {
     	log_message('Error',@$data['code'].' : '.@$data['code_text']);
-    	//$this->CI->output->set_status_header($errorcode);    	
+    	//$this->CI->output->set_status_header($errorcode); 
+    	
+    	header('Content-Type: application/json');
+    	  	
     	$this->json_result($data);
     }
  }
