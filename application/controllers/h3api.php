@@ -58,15 +58,13 @@ class h3api extends CI_Controller {
 		if ($regdate['end_date'] <= date( "c", strtotime('now')))
 		{
 			$this->global_lib->error_result(array('code'=>'-11','code_text'=>'사전등록 마감'));
-		}
-		
+		}		
 		// --------------------------------------------------------------------------
 		// 회원 체크
 		if (!$this->H3apimodel->memberCheck($this->input->post('email')))
 		{
 			$this->global_lib->error_result(array('code'=>'-4','code_text'=>'회원이 아님'));
 		}
-
 		// --------------------------------------------------------------------------
 		// 등록된 이메일인지 체크
 		if ($this->H3apimodel->regView($this->input->post('email')))
@@ -74,8 +72,7 @@ class h3api extends CI_Controller {
 			// --------------------------------------------------------------------------
 			// 이미 등록된 이메일
 			$this->global_lib->error_result(array('code'=>'-13','code_text'=>'이미 등록된 회원'));
-		}
-		
+		}		
 		// --------------------------------------------------------------------------
 		// 전체 카운트 증가
 		$this->H3apimodel->regCountUpdate();
@@ -105,6 +102,7 @@ class h3api extends CI_Controller {
 	function resetcount()
 	{
 		$this->H3apimodel->resetCount();
+		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}	
 	
 	/**
@@ -143,14 +141,15 @@ class h3api extends CI_Controller {
 	 */
 	function setConfig()
 	{
-		if (!$this->input->get('REG_STARTS_AT') or !$this->input->get('REG_ENDS_AT')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
+		if (!$this->input->get('REG_STARTS_AT') or !$this->input->get('REG_ENDS_AT') or !$this->input->get('MAX_COUNT')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 		//$starts_at=date('c',strtotime($this->input->get('starts')));
 		//$ends_at=date('c',strtotime($this->input->get('ends')));
 		
 		$starts_at=$this->input->get('REG_STARTS_AT');
 		$ends_at=$this->input->get('REG_ENDS_AT');
+		$max_count=$this->input->get('MAX_COUNT');
 
-		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at));
+		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at,'max_count'=>$max_count));
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}
 	

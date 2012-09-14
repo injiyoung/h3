@@ -33,7 +33,7 @@ class H3apimodel extends CI_Model {
     	$cdata['postfields']=json_encode(array("REG_STARTS_AT"=>$data['starts_at'],"REG_ENDS_AT"=>$data['ends_at']));
     	$result=$this->global_lib->baas_curl($cdata);
     	
-    	$stmt = $this->db->prepare("update reg_date set start_date='".$data['starts_at']."',end_date='".$data['ends_at']."' ");
+    	$stmt = $this->db->prepare("update reg_date set start_date='".$data['starts_at']."',end_date='".$data['ends_at']."',max_count='".$data['max_count']."' ");
     	if (!$stmt) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[setConfig] table 실패 : '.$errorinfo[2]);
@@ -48,6 +48,11 @@ class H3apimodel extends CI_Model {
 	{
 		$stmt = $this->db->prepare('update reg_data set totalcount=0;');
 		$result=$stmt->execute();
+		if (!$result) {
+			$errorinfo=$this->db->errorInfo();
+			log_message('Error', '[regTotal] select 실패 : '.$errorinfo[2]);
+			$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
+		}		
 	}    
     
    /**

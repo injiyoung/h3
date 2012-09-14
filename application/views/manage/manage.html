@@ -23,7 +23,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 				전체 등록수
 			</td>
 			<td style="background-color:#E8E8E8;">
-				<?=$totalcount?>
+				<?=$totalcount?> <input type=button value="초기화" id="resetCount">
 			</td>
 		</tr>
 		<tr>
@@ -31,16 +31,12 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 				등록 가능수
 			</td>
 			<td style="background-color:#E8E8E8;">
-				<input type="text" name="totalcount" id="totalcount" value="<?=$limitcount?>">
+				<input type="text" name="max_count" id="max_count" value="<?=$limitcount?>">
 			</td>
 		</tr>
-		<tr>
-		<td align=center colspan=2 style="background-color:#E8E8E8; color:#FFFFFF;font-weight:bold;">
-		<input type=submit value=" 저 장 "> 
-		</td>
 		</table>
 	</td>
-	</form>
+
 </tr>
 </table>
 
@@ -49,7 +45,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 	<td style="font-size:24px;font-weight:bold;">H3 info</td>
 </tr>
 <tr>
-	<form  method="get" id="setConfigForm">
+
 	<td>
 		<table cellspacing="1" cellpadding="5" style="background-color:#000000; width:700px">
 		
@@ -71,7 +67,7 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 <?php endforeach;?>		
 
 		<tr>
-		<td align=center colspan=2 style="background-color:#E8E8E8; color:#FFFFFF;font-weight:bold;">
+		<td align=center colspan=2 style="background-color:white; color:#FFFFFF;font-weight:bold;">
 		<input type=submit value=" 저 장 "> 
 		</td>
 		</table>
@@ -89,16 +85,16 @@ body,td,th,pre,textarea,select {font-family: verdana, tahoma, 굴림, 굴림체;
 var $setConfigForm = $('#setConfigForm');
 
 if($setConfigForm.length > 0){
-	var $REG_STARTS_AT = $('#REG_STARTS_AT'),$REG_ENDS_AT = $('#REG_ENDS_AT')
+	var $REG_STARTS_AT = $('#REG_STARTS_AT'),$REG_ENDS_AT = $('#REG_ENDS_AT'),$MAX_COUNT = $('#max_count');
 		
-	var setConfigData = function(REG_STARTS_AT,REG_ENDS_AT){
+	var setConfigData = function(REG_STARTS_AT,REG_ENDS_AT,MAX_COUNT){
 		$.ajax({
 			url			: '/2012/h3api/setconfig/',
 			dataType   	: 'json',
 			type	   	: 'get',
 			contentType	: 'application/x-www-form-urlencoded; charset=UTF-8',
 			timeout		: 3000,
-			data		: {REG_STARTS_AT: REG_STARTS_AT,REG_ENDS_AT: REG_ENDS_AT},
+			data		: {REG_STARTS_AT: REG_STARTS_AT,REG_ENDS_AT: REG_ENDS_AT,MAX_COUNT:MAX_COUNT},
 			success:function(r) {
 				if(r.code != 0){
 					alert('ErrorCode : '+r.code+', ErrorText : ' + r.code_text);
@@ -113,11 +109,33 @@ if($setConfigForm.length > 0){
 	};
 	
 	$setConfigForm.submit(function(){
-		setConfigData($REG_STARTS_AT.val(),$REG_ENDS_AT.val());
+		setConfigData($REG_STARTS_AT.val(),$REG_ENDS_AT.val(),$MAX_COUNT.val());
 		return false;
 	});
 
 }
+
+$('#resetCount').click(function(){
+	$.ajax({
+		url			: '/2012/h3api/resetcount/',
+		dataType   	: 'json',
+		type	   	: 'get',
+		contentType	: 'application/x-www-form-urlencoded; charset=UTF-8',
+		timeout		: 3000,
+
+		success:function(r) {
+			if(r.code != 0){
+				alert('ErrorCode : '+r.code+', ErrorText : ' + r.code_text);
+			} else {
+				alert('초기화 성공');
+			}
+		},
+		error: function(XMLHttpRequest,status){
+		   	alert('네트워크 오류');
+		}
+	});
+});
+
 })(jQuery);
 </script>
 	
