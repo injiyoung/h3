@@ -163,29 +163,55 @@ class H3apimodel extends CI_Model {
     	$result=$this->global_lib->baas_curl($cdata);
    }
    
+   /**
+    * 2012. 9. 17. hdae124@kthcorp.com
+    * 비밀번호 찾기 정보 저장 
+    */
    function schpwdPost($data)
    {
+   		$pwdkey=hash("sha256", $data['email'].strtotime("now"));
 	   	$stmt = $this->db->prepare("insert into pwd_email(email,pwdkey,create_date) values (:email,:pwdkey,:create_date) ");
-	   	$result=$stmt->execute(array(':email'=>$data['email'],'pwdkey'=>hash("sha256", rand(0,99999999)),'create_date'=>date('Y-m-d H:i:s')));
+	   	$result=$stmt->execute(array(':email'=>$data['email'],'pwdkey'=>$pwdkey,'create_date'=>date('Y-m-d H:i:s')));
 
 	   	if (!$result) {
 	   		$errorinfo=$this->db->errorInfo();
 	   		log_message('Error', '[regCountUpdate] insert 실패 : '.$errorinfo[2]);
 	   		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
 	   	}
+	   	
+	   	return $pwdkey;
    }
 	   	
-	function schpwdGet()
+	/**
+	 * 2012. 9. 17. hdae124@kthcorp.com
+	 * 비밀번호 찾기 정고 가져오기
+	 */
+	function schpwdGet($data)
 	{
-	   	$stmt = $this->db->prepare('SELECT * FROM pwd_email where pwdkey=:pwdkey');
-	   	$stmt->bindParam(':pwdkey',$pwdkey , PDO::PARAM_STR);
-	   	$result=$stmt->execute();
-	   	
+	   	$stmt = $this->db->prepare('SELECT * FROM pwd_email where pwdkey=:pwdkey and create_date>:todaydate order by create_date desc limit 1');
+	   	$result=$stmt->execute(array(':pwdkey'=>$data['pwdkey'],':todaydate'=>date('Y-m-d H:i:s',strtotime('-6 hours'))));
+
 	   	if (!$result) {
 	   		$errorinfo=$this->db->errorInfo();
 	   		log_message('Error', '[regTotal] select 실패 : '.$errorinfo[2]);
 	   		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
-	   	}  		
+	   	}
+	   	
+		$row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_LAST);
+     	return $row;
+   }
+   
+   /**
+    * 2012. 9. 17. hdae124@kthcorp.com
+    * 비밀번호 변경API
+    */
+   function changePasswd($data) 
+   {
+   	// 여기에 BaaS변경 모듈
+/* 	   	$cdata['url']="user/".$result_json['uuid'];
+	   	$cdata['post']="false";
+	   	$cdata['customerquest']="PUT";
+	   	$cdata['postfields']=json_encode(array("REG_STARTS_AT"=>$data['starts_at'],"REG_ENDS_AT"=>$data['ends_at'])); */
    }
    
 } 

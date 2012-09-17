@@ -115,12 +115,13 @@ class h3api extends CI_Controller {
 			
 		if ($this->H3apimodel->memberCheck($this->input->get('email')))
 		{
-   			$data['subject']="메롱";
-   			$data['body']="바바";
-   			$data['email']=$this->input->get('email');
-   			//$this->global_lib->send_mail($data);
-   			
-   			//$this->H3apimodel->schpwdPost($data);
+			$data['email']=$this->input->get('email');
+						
+			$pwdkey=$this->H3apimodel->schpwdPost($data);
+			
+			$data['subject']="메롱";			
+			$data['body']="<a href='http://h3.kthcorp.com/2012/user/resetPasswd/?email=".$this->input->get('email')."&pwdkey=".$pwdkey."' target=_blank>비번 바꿔</a> ";
+   			$this->global_lib->send_mail($data);
    			
    			$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 		} else {
@@ -143,16 +144,42 @@ class h3api extends CI_Controller {
 	 */
 	function setConfig()
 	{
-		if (!$this->input->get('REG_STARTS_AT') or !$this->input->get('REG_ENDS_AT') or !$this->input->get('MAX_COUNT')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 		//$starts_at=date('c',strtotime($this->input->get('starts')));
 		//$ends_at=date('c',strtotime($this->input->get('ends')));
 		
 		$starts_at=$this->input->get('REG_STARTS_AT');
 		$ends_at=$this->input->get('REG_ENDS_AT');
 		$max_count=$this->input->get('MAX_COUNT');
+		
+		if (!$starts_at or !$ends_at or !$max_count) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));		
 
 		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at,'max_count'=>$max_count));
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
+	}
+	
+	/**
+	 * 2012. 9. 17. hdae124@kthcorp.com
+	 * 비밀번호 변경API 
+	 */
+	function changePasswd()
+	{
+		$data['email']=$this->input->get('email');
+		$data['pwdkey']=$this->input->get('pwdkey');
+		$data['new_passwd']=$this->input->get('new_passwd');
+		
+		if (!$data['email'] or !$data['pwdkey'] or !$data['new_passwd']) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
+		
+		$row=$this->H3apimodel->schpwdGet($data);
+		
+		if (!$row) {
+			$this->global_lib->error_result(array('code'=>'-11','code_text'=>'6시간이 지났거나 유효한키가 아님'));
+		} else if ($row['change_ok']=='y') {
+			$this->global_lib->error_result(array('code'=>'-12','code_text'=>'이미 변경한 키'));
+		}
+				
+		$this->H3apimodel->changePasswd($data);
+		
+		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));		
 	}
 	
 	function index()

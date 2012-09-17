@@ -18,7 +18,9 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	define('ENVIRONMENT', 'development');
+
+if ($_SERVER['REMOTE_ADDR']=="211.113.46.100") define('ENVIRONMENT', 'production');
+	else define('ENVIRONMENT', 'development');
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING

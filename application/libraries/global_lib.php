@@ -62,7 +62,7 @@ class Global_lib {
 	   	if (@$data['postfields']) curl_setopt($ch, CURLOPT_POSTFIELDS, @$data['postfields']);
 	   	if (@$data['customerquest']) curl_setopt($ch, CURLOPT_CUSTOMREQUEST, @$data['customerquest']);
      	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-     	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+     	curl_setopt($ch, CURLOPT_TIMEOUT, 1);
      	$result_data=curl_exec($ch);
      	
      	if (curl_error($ch)) {
