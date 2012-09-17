@@ -19,7 +19,7 @@
  *
  */
 
-if ($_SERVER['REMOTE_ADDR']=="211.113.46.100") define('ENVIRONMENT', 'production');
+if ($_SERVER['SERVER_ADDR']=="211.113.46.100") define('ENVIRONMENT', 'production');
 	else define('ENVIRONMENT', 'development');
 /*
  *---------------------------------------------------------------
