@@ -99,7 +99,7 @@ class Global_lib {
     		$cdata['post']="false";
     		$cdata['mode']="token";
     		$result=$this->baas_curl($cdata);
-    		$result_json=json_decode($result['result_data'],true);
+    		$result_json=json_decode(@$result['result_data'],true);
     		$token=$result_json['access_token'];
     		
     		$stmt = $this->db->prepare("update token set expire_time='".strtotime('now +'.$result_json['expires_in'].' sec ')."',token='".$result_json['access_token']."' ");

@@ -111,7 +111,7 @@ class H3apimodel extends CI_Model {
     	$cdata['post']="false";
     	$result=$this->global_lib->baas_curl($cdata);
     
-    	$json_result=json_decode($result['result_data'],true);
+    	$json_result=json_decode(@$result['result_data'],true);
     	
     	if ($json_result['entities']) {
     		return $json_result['entities'];

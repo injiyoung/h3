@@ -113,7 +113,7 @@ class h3api extends CI_Controller {
 	{
 		if (!$this->input->get('email')) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));
 			
-		if ($this->H3apimodel->regView($this->input->get('email')))
+		if ($this->H3apimodel->memberCheck($this->input->get('email')))
 		{
    			$data['subject']="메롱";
    			$data['body']="바바";
