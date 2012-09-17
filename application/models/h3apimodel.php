@@ -50,7 +50,7 @@ class H3apimodel extends CI_Model {
 		$result=$stmt->execute();
 		if (!$result) {
 			$errorinfo=$this->db->errorInfo();
-			log_message('Error', '[regTotal] select 실패 : '.$errorinfo[2]);
+			log_message('Error', '[resetCount] update 실패 : '.$errorinfo[2]);
 			$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
 		}		
 	}    
@@ -163,6 +163,30 @@ class H3apimodel extends CI_Model {
     	$result=$this->global_lib->baas_curl($cdata);
    }
    
+   function schpwdPost($data)
+   {
+	   	$stmt = $this->db->prepare("insert into pwd_email(email,pwdkey,create_date) values (:email,:pwdkey,:create_date) ");
+	   	$result=$stmt->execute(array(':email'=>$data['email'],'pwdkey'=>hash("sha256", rand(0,99999999)),'create_date'=>date('Y-m-d H:i:s')));
+
+	   	if (!$result) {
+	   		$errorinfo=$this->db->errorInfo();
+	   		log_message('Error', '[regCountUpdate] insert 실패 : '.$errorinfo[2]);
+	   		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
+	   	}
+   }
+	   	
+	function schpwdGet()
+	{
+	   	$stmt = $this->db->prepare('SELECT * FROM pwd_email where pwdkey=:pwdkey');
+	   	$stmt->bindParam(':pwdkey',$pwdkey , PDO::PARAM_STR);
+	   	$result=$stmt->execute();
+	   	
+	   	if (!$result) {
+	   		$errorinfo=$this->db->errorInfo();
+	   		log_message('Error', '[regTotal] select 실패 : '.$errorinfo[2]);
+	   		$this->global_lib->error_result(array('code'=>'-1','code_text'=>'DB오류'));
+	   	}  		
+   }
    
 } 
 

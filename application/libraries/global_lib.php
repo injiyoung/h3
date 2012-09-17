@@ -40,7 +40,7 @@ class Global_lib {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic ' . base64_encode("puddingto:".$this->CI->config->item('ext_email'))));
 		curl_setopt($ch, CURLOPT_POSTFIELDS, array('from'=>'H3 <h3@kthcorp.com>','to'=>$data['email'],'Subject'=>$data['subject'],'Contents'=>$data['body']));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 2);
 		$result_data=curl_exec ($ch);
 		curl_close($ch);
 		
@@ -72,7 +72,7 @@ class Global_lib {
      		$info['result_data']=$result_data;
 
      		if ($info['http_code']!="200") {
-     			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.@$result['http_code'].' - '.@$result['error_text']);
+     			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.$info['http_code'].' - '.@$result_data['error_text']);
      			$this->error_result(array('code'=>'-2','code_text'=>'BaaS오류'),$info['http_code']);
      		}
      	}
@@ -133,17 +133,21 @@ class Global_lib {
      */ 
     function json_result($data)
     {
-    	header('Content-Type: application/json');
+    	@header('Content-Type: application/json');
+    	@header('Pragma: no-cache');
     	echo json_encode($data);
     	exit;
     }
     
     function error_result($data,$errorcode='500') {
+    	$post_var="";
+    	$get_var="";
+    	if ($_POST) foreach ($_POST as $key => $value) $post_var .= "&$key=$value";
+    	if ($_GET) foreach ($_GET as $key => $value) $get_var .= "&$key=$value";
+    	if ($post_var) log_message("Error","POST : ".$post_var);
+    	if ($get_var) log_message("Error","GET : ".$get_var);    	
     	log_message('Error',@$data['code'].' : '.@$data['code_text']);
     	//$this->CI->output->set_status_header($errorcode); 
-    	
-    	header('Content-Type: application/json');
-    	  	
     	$this->json_result($data);
     }
  }

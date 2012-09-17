@@ -102,14 +102,12 @@ class h3api extends CI_Controller {
 	function resetcount()
 	{
 		$this->H3apimodel->resetCount();
-		$this->output->set_content_type('application/json');		
-		$this->output->set_header("Content-Type: application/json");
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}	
 	
 	/**
 	 * 2012. 9. 11. hdae124@kthcorp.com
-	 * 패스워드찾기
+	 * 패스워드찾기 이메일 보내기
 	 */
 	function schpwd()
 	{
@@ -120,7 +118,9 @@ class h3api extends CI_Controller {
    			$data['subject']="메롱";
    			$data['body']="바바";
    			$data['email']=$this->input->get('email');
-   			$this->global_lib->send_mail($data);
+   			//$this->global_lib->send_mail($data);
+   			
+   			//$this->H3apimodel->schpwdPost($data);
    			
    			$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 		} else {
