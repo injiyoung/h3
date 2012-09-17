@@ -19,10 +19,8 @@
  *
  */
 
-phpinfo();
-
 // 서비스장비에서는 오류메시지 표시하지 않는다.
-if ($_SERVER['HTTP_HOST ']=="h3.kthcorp.com") define('ENVIRONMENT', 'production');
+if ($_SERVER['HTTP_HOST']=="h3.kthcorp.com") define('ENVIRONMENT', 'production');
 	else define('ENVIRONMENT', 'development');
 /*
  *---------------------------------------------------------------
