@@ -147,13 +147,24 @@ class h3api extends CI_Controller {
 		//$starts_at=date('c',strtotime($this->input->get('starts')));
 		//$ends_at=date('c',strtotime($this->input->get('ends')));
 		
-		$starts_at=$this->input->get('REG_STARTS_AT');
-		$ends_at=$this->input->get('REG_ENDS_AT');
-		$max_count=$this->input->get('MAX_COUNT');
+		$data['REG_STARTS_AT']=$this->input->post('REG_STARTS_AT');
+		$data['REG_ENDS_AT']=$this->input->post('REG_ENDS_AT');
+		$data['MAX_COUNT']=$this->input->post('MAX_COUNT');
 		
-		if (!$starts_at or !$ends_at or !$max_count) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));		
+		$data['CONF_ENDS_AT']=$this->input->post('CONF_ENDS_AT');
+		$data['CONF_STARTS_AT']=$this->input->post('CONF_STARTS_AT');
+		$data['NOTICE_UPDATED_AT']=$this->input->post('NOTICE_UPDATED_AT');
+		$data['SHARE_BASIC_INFO']=$this->input->post('SHARE_BASIC_INFO');
+		$data['SHARE_SESSION_INFO']=$this->input->post('SHARE_SESSION_INFO');
+		$data['SHARE_SESSION_URL']=$this->input->post('SHARE_SESSION_URL');
+		$data['TRACK_ENABLED']=$this->input->post('TRACK_ENABLED');
+		$data['TRACK_UPDATED_AT']=$this->input->post('TRACK_UPDATED_AT');
+		$data['VOTE_ENDS_AT']=$this->input->post('VOTE_ENDS_AT');
+		$data['VOTE_LIMIT_COUNT']=$this->input->post('VOTE_LIMIT_COUNT');
+		
+		if (!$data['REG_STARTS_AT'] or !$data['REG_ENDS_AT'] or !$data['MAX_COUNT']) $this->global_lib->error_result(array('code'=>'-3','code_text'=>'파라미터 부족'));		
 
-		$this->H3apimodel->setConfig(array('starts_at'=>$starts_at,'ends_at'=>$ends_at,'max_count'=>$max_count));
+		$this->H3apimodel->setConfig($data);
 		$this->global_lib->json_result(array('code'=>'0','code_text'=>'성공'));
 	}
 	

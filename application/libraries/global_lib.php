@@ -66,11 +66,12 @@ class Global_lib {
      	$result_data=curl_exec($ch);
      	
      	if (curl_error($ch)) {
-     		$info['error_text']=curl_error($ch);
+   			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.curl_errno($ch).' - '.curl_error($ch));
+   			$this->error_result(array('code'=>'-2','code_text'=>'BaaS오류'));
      	} else {
      		$info = curl_getinfo($ch);
      		$info['result_data']=$result_data;
-
+     		
      		if ($info['http_code']!="200") {
      			log_message('Error', '['.$data['url'].'] BaaS 조회 실패 : '.$info['http_code'].' - '.@$result_data['error_text']);
      			$this->error_result(array('code'=>'-2','code_text'=>'BaaS오류'),$info['http_code']);

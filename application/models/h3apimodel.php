@@ -27,13 +27,17 @@ class H3apimodel extends CI_Model {
     	// 가장 최신에 수정된 h3info를 가지고 온다.
 		$result_json=$this->global_lib->getConfig();
 		
+		$max_count=$data['MAX_COUNT'];
+		
+		unset($data['MAX_COUNT']);
+	
     	$cdata['url']="h3info/".$result_json['uuid'];
     	$cdata['post']="false";
     	$cdata['customerquest']="PUT";
-    	$cdata['postfields']=json_encode(array("REG_STARTS_AT"=>$data['starts_at'],"REG_ENDS_AT"=>$data['ends_at']));
+    	$cdata['postfields']=json_encode($data);
     	$result=$this->global_lib->baas_curl($cdata);
     	
-    	$stmt = $this->db->prepare("update reg_date set start_date='".$data['starts_at']."',end_date='".$data['ends_at']."',max_count='".$data['max_count']."' ");
+    	$stmt = $this->db->prepare("update reg_date set start_date='".$data['REG_STARTS_AT']."',end_date='".$data['REG_ENDS_AT']."',max_count='".$max_count."' ");
     	if (!$stmt) {
     		$errorinfo=$this->db->errorInfo();
     		log_message('Error', '[setConfig] table 실패 : '.$errorinfo[2]);
